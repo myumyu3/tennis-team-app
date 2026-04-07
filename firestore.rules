@@ -1,0 +1,67 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ヘルパー関数: ログイン済みかチェック
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // ヘルパー関数: 指定チームの管理者かチェック
+    function isTeamAdmin(teamId) {
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/members/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/members/$(request.auth.uid)).data.teamId == teamId &&
+             get(/databases/$(database)/documents/members/$(request.auth.uid)).data.istAdmin == true;
+    }
+    
+    // ヘルパー関数: 指定チームのメンバーかチェック
+    function isTeamMember(teamId) {
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/members/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/members/$(request.auth.uid)).data.teamId == teamId &&
+             get(/databases/$(database)/documents/members/$(request.auth.uid)).data.aktiv == true;
+    }
+    
+    // チーム
+    match /teams/{teamId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isTeamAdmin(teamId);
+    }
+    
+    // メンバー
+    match /members/{memberId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isTeamAdmin(resource.data.teamId);
+    }
+    
+    // 試合
+    match /matches/{matchId} {
+      allow read: if isTeamMember(resource.data.teamId);
+      allow write: if isTeamAdmin(resource.data.teamId);
+    }
+    
+    // 出場回答
+    match /teilnahmen/{teilnahmeId} {
+      allow read: if isTeamMember(resource.data.teamId);
+      allow create: if isSignedIn() && 
+                       request.resource.data.mitgliedId == request.auth.uid &&
+                       isTeamMember(request.resource.data.teamId);
+      allow update, delete: if resource.data.mitgliedId == request.auth.uid ||
+                              isTeamAdmin(resource.data.teamId);
+    }
+    
+    // Heimspiel 持ち物割り当て
+    match /heim_spiel_aufgaben/{aufgabeId} {
+      allow read: if isTeamMember(resource.data.teamId);
+      allow write: if isTeamAdmin(resource.data.teamId);
+    }
+    
+    // Gastspiel 車割り当て
+    match /gast_spiel_autos/{autoId} {
+      allow read: if isTeamMember(resource.data.teamId);
+      allow write: if isTeamAdmin(resource.data.teamId);
+    }
+  }
+}
