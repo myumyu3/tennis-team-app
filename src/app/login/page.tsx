@@ -24,7 +24,10 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const germanDate = convertIsoToGerman(geburtsdatum);
+		const germanDate = convertIsoToGerman(geburtsdatum);
+		console.log('🔍 入力値:', geburtsdatum);
+		console.log('🔍 変換後:', germanDate);
+		console.log('🔍 苗字:', nachname);
       const result = await authLogin(nachname, germanDate);
 
       if (!result) {

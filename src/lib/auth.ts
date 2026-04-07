@@ -193,9 +193,10 @@ export async function login(
       where('geburtsdatum', '==', geburtsdatum),
       where('aktiv', '==', true)
     );
-    
+    console.log('🔍 クエリ条件:', { nachname, geburtsdatum, aktiv: true });
     const memberSnapshot = await getDocs(q);
-    
+	console.log('🔍 検索結果の数:', memberSnapshot.size);
+	console.log('🔍 空？:', memberSnapshot.empty);
     if (memberSnapshot.empty) {
       return null;
     }
