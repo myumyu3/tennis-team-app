@@ -185,6 +185,7 @@ export async function login(
   teamId?: string
 ): Promise<{ teams: Team[]; member?: Member; team?: Team } | null> {
   try {
+	  console.log('🔍 Anonymous Auth開始...');
     // 該当するメンバーを検索
     const membersRef = collection(db, 'members');
     const q = query(
@@ -209,6 +210,7 @@ export async function login(
     // Firebase Anonymous Authでログイン
     const userCredential = await signInAnonymously(auth);
     const uid = userCredential.user.uid;
+	console.log('✅ Anonymous Auth成功！UID:', uid);
     
     // 各メンバーのチーム情報を取得
     const teams: Team[] = [];
