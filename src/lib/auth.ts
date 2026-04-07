@@ -1,7 +1,8 @@
-// 認証関連のユーティリティ関数（マルチチーム対応版 - 改善版）
+// 認証関連のユーティリティ関数（Firebase Anonymous Auth対応版）
 
-import { collection, query, where, getDocs, addDoc, doc, getDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { collection, query, where, getDocs, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { signInAnonymously } from 'firebase/auth';
+import { db, auth } from './firebase';
 import { Member, Team, SessionData } from '@/types';
 
 /**
@@ -26,6 +27,10 @@ export async function createTeam(
   adminGeburtsdatum: string
 ): Promise<{ team: Team; member: Member } | null> {
   try {
+    // Firebase Anonymous Authでログイン
+    const userCredential = await signInAnonymously(auth);
+    const uid = userCredential.user.uid;
+    
     // 招待コード生成（重複チェック付き）
     let einladungscode = generateEinladungscode();
     let isDuplicate = true;
@@ -55,8 +60,9 @@ export async function createTeam(
       createdAt: Date.now()
     };
     
-    // 管理者メンバーを作成
+    // 管理者メンバーを作成（uidを追加）
     const memberRef = await addDoc(collection(db, 'members'), {
+      uid: uid,
       teamId: teamRef.id,
       nachname: adminNachname,
       vorname: adminVorname,
@@ -67,6 +73,7 @@ export async function createTeam(
     
     const member: Member = {
       id: memberRef.id,
+      uid: uid,
       teamId: teamRef.id,
       nachname: adminNachname,
       vorname: adminVorname,
@@ -118,17 +125,31 @@ export async function joinTeam(
     const existingMember = await getDocs(memberQuery);
     
     if (!existingMember.empty) {
-      // 既存メンバーとしてログイン
+      // 既存メンバー - Firebase Authでログイン
+      const userCredential = await signInAnonymously(auth);
+      const uid = userCredential.user.uid;
+      
       const memberDoc = existingMember.docs[0];
       const member: Member = {
         id: memberDoc.id,
         ...memberDoc.data()
       } as Member;
+      
+      // uidが未設定の場合は更新
+      if (!member.uid) {
+        await updateDoc(doc(db, 'members', member.id), { uid });
+        member.uid = uid;
+      }
+      
       return { team, member };
     }
     
-    // 新規メンバーとして追加
+    // 新規メンバー - Firebase Authでログインしてから追加
+    const userCredential = await signInAnonymously(auth);
+    const uid = userCredential.user.uid;
+    
     const memberRef = await addDoc(collection(db, 'members'), {
+      uid: uid,
       teamId: team.id,
       nachname,
       vorname,
@@ -139,6 +160,7 @@ export async function joinTeam(
     
     const member: Member = {
       id: memberRef.id,
+      uid: uid,
       teamId: team.id,
       nachname,
       vorname,
@@ -183,6 +205,10 @@ export async function login(
       ...doc.data()
     } as Member));
     
+    // Firebase Anonymous Authでログイン
+    const userCredential = await signInAnonymously(auth);
+    const uid = userCredential.user.uid;
+    
     // 各メンバーのチーム情報を取得
     const teams: Team[] = [];
     for (const member of members) {
@@ -192,6 +218,12 @@ export async function login(
           id: teamDoc.id,
           ...teamDoc.data()
         } as Team);
+      }
+      
+      // uidが未設定の場合は更新
+      if (!member.uid) {
+        await updateDoc(doc(db, 'members', member.id), { uid });
+        member.uid = uid;
       }
     }
     
@@ -281,7 +313,7 @@ export function parseGermanDate(dateStr: string): Date | null {
   if (parts.length !== 3) return null;
   
   const day = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10) - 1; // 月は0始まり
+  const month = parseInt(parts[1], 10) - 1;
   const year = parseInt(parts[2], 10);
   
   return new Date(year, month, day);

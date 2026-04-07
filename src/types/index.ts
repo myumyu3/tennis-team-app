@@ -1,20 +1,21 @@
-// データモデルの型定義（マルチチーム対応版 - 改善版）
+// データモデルの型定義（Firebase Anonymous Auth対応版）
 
 export interface Team {
   id: string;
-  name: string;              // チーム名
-  einladungscode: string;    // 6桁の招待コード
-  createdAt: number;         // timestamp
+  name: string;
+  einladungscode: string;
+  createdAt: number;
 }
 
 export interface Member {
   id: string;
-  teamId: string;            // 所属チームID
-  nachname: string;          // 苗字
-  vorname: string;           // 名前
+  uid?: string;              // Firebase Auth UID（既存データとの互換性のためオプショナル）
+  teamId: string;
+  nachname: string;
+  vorname: string;
   geburtsdatum: string;      // TT.MM.JJJJ 形式
-  istAdmin: boolean;         // 管理者フラグ
-  aktiv: boolean;            // アクティブフラグ
+  istAdmin: boolean;
+  aktiv: boolean;
 }
 
 export interface Match {
@@ -22,45 +23,44 @@ export interface Match {
   teamId: string;
   datum: string;             // TT.MM.JJJJ
   uhrzeit?: string;          // HH:MM（オプショナル）
-  gegner: string;            // 相手チーム名
-  istHeimspiel: boolean;     // true=Heimspiel, false=Auswärtsspiel
-  ort: string;               // 会場
+  gegner: string;
+  istHeimspiel: boolean;
+  ort: string;
 }
 
 export type TeilnahmeStatus = 
-  | "verfuegbar"           // 出場可能
-  | "nur_doppel"           // ダブルスのみ
-  | "vielleicht"           // 未定
-  | "nicht_verfuegbar";    // 不可能
+  | "verfuegbar"
+  | "nur_doppel"
+  | "vielleicht"
+  | "nicht_verfuegbar";
 
 export interface Teilnahme {
   id: string;
   teamId: string;
-  spielId: string;           // matchId
-  mitgliedId: string;        // memberId
+  spielId: string;
+  mitgliedId: string;
   status: TeilnahmeStatus;
   kommentar?: string;
-  aktualisiertAm: number;    // timestamp
+  aktualisiertAm: number;
 }
 
 export interface HeimSpielAufgabe {
   id: string;
   teamId: string;
   spielId: string;
-  gegenstand: string;        // 持ち物名
-  zugewiesenAn: string | null;  // memberId
+  gegenstand: string;
+  zugewiesenAn: string | null;
 }
 
 export interface GastSpielAuto {
   id: string;
   teamId: string;
   spielId: string;
-  fahrerId: string;          // memberId
-  freiePlaetze: number;      // 空席数
+  fahrerId: string;
+  freiePlaetze: number;
   notiz?: string;
 }
 
-// UI用の拡張型
 export interface MatchWithTeilnahme extends Match {
   meineTeilnahme?: Teilnahme;
   totalVerfuegbar?: number;
@@ -73,7 +73,6 @@ export interface TeilnahmeWithMember extends Teilnahme {
   member?: Member;
 }
 
-// ローカルストレージ用のセッションデータ
 export interface SessionData {
   member: Member;
   team: Team;

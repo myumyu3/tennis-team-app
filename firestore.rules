@@ -1,9 +1,19 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // === Firebase Anonymous Auth対応版のセキュリティルール ===
+    
     // ヘルパー関数: ログイン済みかチェック
     function isSignedIn() {
       return request.auth != null;
+    }
+    
+    // ヘルパー関数: 指定されたメンバードキュメントのuidと一致するかチェック
+    function isMemberWithUid(memberId) {
+      return isSignedIn() && 
+             exists(/databases/$(database)/documents/members/$(memberId)) &&
+             get(/databases/$(database)/documents/members/$(memberId)).data.uid == request.auth.uid;
     }
     
     // ヘルパー関数: 指定チームの管理者かチェック
@@ -14,7 +24,7 @@ service cloud.firestore {
              get(/databases/$(database)/documents/members/$(request.auth.uid)).data.istAdmin == true;
     }
     
-    // ヘルパー関数: 指定チームのメンバーかチェック
+    // ヘルパー関数: 指定チームのメンバーかチェック（uidベース）
     function isTeamMember(teamId) {
       return isSignedIn() && 
              exists(/databases/$(database)/documents/members/$(request.auth.uid)) &&
@@ -31,9 +41,19 @@ service cloud.firestore {
     
     // メンバー
     match /members/{memberId} {
+      // 読み取り: ログイン済みなら可能
       allow read: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update, delete: if isTeamAdmin(resource.data.teamId);
+      
+      // 作成: ログイン済みで、自分のuidをセットする場合のみ
+      allow create: if isSignedIn() && 
+                       request.resource.data.uid == request.auth.uid;
+      
+      // 更新: 自分のメンバードキュメント、または同じチームの管理者
+      allow update: if isMemberWithUid(memberId) || 
+                       isTeamAdmin(resource.data.teamId);
+      
+      // 削除: 同じチームの管理者のみ
+      allow delete: if isTeamAdmin(resource.data.teamId);
     }
     
     // 試合
@@ -45,10 +65,14 @@ service cloud.firestore {
     // 出場回答
     match /teilnahmen/{teilnahmeId} {
       allow read: if isTeamMember(resource.data.teamId);
+      
+      // 作成: ログイン済みで、自分のmitgliedIdをセット
       allow create: if isSignedIn() && 
-                       request.resource.data.mitgliedId == request.auth.uid &&
+                       isMemberWithUid(request.resource.data.mitgliedId) &&
                        isTeamMember(request.resource.data.teamId);
-      allow update, delete: if resource.data.mitgliedId == request.auth.uid ||
+      
+      // 更新・削除: 自分の回答、または管理者
+      allow update, delete: if isMemberWithUid(resource.data.mitgliedId) ||
                               isTeamAdmin(resource.data.teamId);
     }
     

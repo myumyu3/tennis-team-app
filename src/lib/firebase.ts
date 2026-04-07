@@ -1,7 +1,8 @@
-// Firebase の初期化と設定
+// Firebase の初期化と設定（Anonymous Auth対応版）
 
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -17,5 +18,8 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 
 // Firestore インスタンスの取得
 export const db = getFirestore(app);
+
+// Firebase Authentication インスタンスの取得
+export const auth = getAuth(app);
 
 export default app;
