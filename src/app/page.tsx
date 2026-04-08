@@ -87,12 +87,19 @@ export default function HomePage() {
       {/* フッター */}
       <footer className="bg-white border-t border-gray-200 py-6">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="mb-3">
+          <div className="mb-3 flex items-center justify-center gap-4">
             <button
               onClick={() => router.push('/anleitung')}
               className="text-primary-600 hover:text-primary-700 font-medium text-sm"
             >
               📖 Anleitung
+            </button>
+            <span className="text-gray-300">|</span>
+            <button
+              onClick={() => router.push('/kontakt')}
+              className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+            >
+              📧 Kontakt
             </button>
           </div>
           <p className="text-sm text-gray-600 flex items-center justify-center gap-2">

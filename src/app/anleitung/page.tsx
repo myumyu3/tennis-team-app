@@ -189,12 +189,25 @@ export default function AnleitungPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">📞 Support</h2>
             <p className="text-gray-700">Bei Problemen oder Fragen:</p>
-            <ul className="list-disc list-inside text-gray-700 space-y-1 mt-2">
+            <ul className="list-disc list-inside text-gray-700 space-y-1 mt-2 mb-4">
               <li>Kontaktiere deinen Teamleiter</li>
               <li>Prüfe deine Internetverbindung</li>
               <li>Aktualisiere die Seite (F5 oder Strg+R)</li>
               <li>Versuche einen anderen Browser</li>
             </ul>
+            
+            <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+              <p className="text-gray-700 mb-3">
+                <strong>🐛 Bug gefunden oder Feedback?</strong><br />
+                Wir freuen uns über deine Rückmeldung!
+              </p>
+              <button
+                onClick={() => router.push('/kontakt')}
+                className="btn-primary"
+              >
+                📧 Kontakt aufnehmen
+              </button>
+            </div>
           </section>
 
           {/* Viel Erfolg */}
