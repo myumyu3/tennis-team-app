@@ -153,8 +153,19 @@ export default function MembersPage() {
           <button onClick={() => router.push('/matches')} className="text-primary-600 hover:text-primary-700 font-medium mb-2">
             ← Zurück zur Übersicht
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">👥 Mitgliederverwaltung</h1>
-          <p className="text-sm text-gray-600 mt-1">{team.name}</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">👥 Mitgliederverwaltung</h1>
+              <p className="text-sm text-gray-600 mt-1">{team.name}</p>
+            </div>
+            <button
+              onClick={() => router.push('/settings')}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center gap-2"
+            >
+              <span>⚙️</span>
+              <span className="hidden sm:inline">Einstellungen</span>
+            </button>
+          </div>
         </div>
       </header>
 
