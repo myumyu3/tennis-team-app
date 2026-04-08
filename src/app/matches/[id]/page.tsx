@@ -12,7 +12,7 @@ import {
 import { db } from '@/lib/firebase';
 import { 
   Match, Teilnahme, TeilnahmeStatus, Member, 
-  HeimSpielAufgabe, GastSpielAuto, TeilnahmeWithMember 
+  HeimSpielAufgabe, GastSpielAuto, TeilnahmeWithMember, SelectionStatus
 } from '@/types';
 
 export default function MatchDetailPage() {
@@ -168,7 +168,9 @@ export default function MatchDetailPage() {
         mitgliedId: member.id,
         status: selectedStatus,
         kommentar: kommentar.trim() || null,
-        aktualisiertAm: Date.now()
+        aktualisiertAm: Date.now(),
+        // nicht_verfuegbarの場合、選抜をリセット
+        ...(selectedStatus === 'nicht_verfuegbar' && { selectionStatus: 'none' })
       };
 
       if (meineTeilnahme) {
@@ -184,6 +186,28 @@ export default function MatchDetailPage() {
       alert('Fehler beim Speichern');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // 選抜ステータスの更新（管理者のみ）
+  const handleSelectionChange = async (teilnahmeId: string, newSelectionStatus: SelectionStatus) => {
+    if (!member?.istAdmin) return;
+
+    try {
+      await updateDoc(doc(db, 'teilnahmen', teilnahmeId), {
+        selectionStatus: newSelectionStatus,
+        aktualisiertAm: Date.now()
+      });
+
+      // ローカルステートを更新（リアルタイム反映）
+      setAllTeilnahmen(prev =>
+        prev.map(t =>
+          t.id === teilnahmeId ? { ...t, selectionStatus: newSelectionStatus } : t
+        )
+      );
+    } catch (error) {
+      console.error('Error updating selection:', error);
+      alert('Fehler beim Aktualisieren der Auswahl');
     }
   };
 
@@ -301,6 +325,11 @@ export default function MatchDetailPage() {
       alert('Fehler beim Austragen');
     }
   };
+
+  // 選抜可能メンバーの抽出と集計
+  const verfuegbarTeilnahmen = allTeilnahmen.filter(t => t.status === 'verfuegbar');
+  const nominiertCount = verfuegbarTeilnahmen.filter(t => t.selectionStatus === 'nominiert').length;
+  const reserveCount = verfuegbarTeilnahmen.filter(t => t.selectionStatus === 'reserve').length;
 
   if (loading || isLoading || !member || !team || !match) {
     return (
@@ -438,27 +467,149 @@ export default function MatchDetailPage() {
             </div>
             
             <div className="space-y-2">
-              {members.map(m => {
-                const teilnahme = allTeilnahmen.find(a => a.mitgliedId === m.id);
-                return (
-                  <div key={m.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                    <span className="font-medium">{m.vorname} {m.nachname}</span>
-                    <span className={`status-badge ${
-                      teilnahme?.status === 'verfuegbar' ? 'bg-green-100 text-green-800' :
-                      teilnahme?.status === 'nur_doppel' ? 'bg-blue-100 text-blue-800' :
-                      teilnahme?.status === 'vielleicht' ? 'bg-yellow-100 text-yellow-800' :
-                      teilnahme?.status === 'nicht_verfuegbar' ? 'bg-red-100 text-red-800' :
-                      'bg-gray-100 text-gray-600'
-                    }`}>
-                      {teilnahme?.status === 'verfuegbar' && '✓ Dabei'}
-                      {teilnahme?.status === 'nur_doppel' && 'D Doppel'}
-                      {teilnahme?.status === 'vielleicht' && '? Vielleicht'}
-                      {teilnahme?.status === 'nicht_verfuegbar' && '✗ Abwesend'}
-                      {!teilnahme && '− Keine Antwort'}
-                    </span>
-                  </div>
-                );
-              })}
+              {/* 選抜順にソート: nominiert → reserve → その他 */}
+              {[...members]
+                .sort((a, b) => {
+                  const aTeilnahme = allTeilnahmen.find(t => t.mitgliedId === a.id);
+                  const bTeilnahme = allTeilnahmen.find(t => t.mitgliedId === b.id);
+                  const order = { nominiert: 0, reserve: 1, none: 2 };
+                  const aOrder = order[aTeilnahme?.selectionStatus || 'none'];
+                  const bOrder = order[bTeilnahme?.selectionStatus || 'none'];
+                  return aOrder - bOrder;
+                })
+                .map(m => {
+                  const teilnahme = allTeilnahmen.find(a => a.mitgliedId === m.id);
+                  return (
+                    <div key={m.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-medium">{m.vorname} {m.nachname}</span>
+                          
+                          {/* 選抜バッジ */}
+                          {teilnahme?.selectionStatus === 'nominiert' && (
+                            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                              ⭐ Nominiert
+                            </span>
+                          )}
+                          {teilnahme?.selectionStatus === 'reserve' && (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                              🔄 Reserve
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <span className={`status-badge ${
+                        teilnahme?.status === 'verfuegbar' ? 'bg-green-100 text-green-800' :
+                        teilnahme?.status === 'nur_doppel' ? 'bg-blue-100 text-blue-800' :
+                        teilnahme?.status === 'vielleicht' ? 'bg-yellow-100 text-yellow-800' :
+                        teilnahme?.status === 'nicht_verfuegbar' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-600'
+                      }`}>
+                        {teilnahme?.status === 'verfuegbar' && '✓ Dabei'}
+                        {teilnahme?.status === 'nur_doppel' && 'D Doppel'}
+                        {teilnahme?.status === 'vielleicht' && '? Vielleicht'}
+                        {teilnahme?.status === 'nicht_verfuegbar' && '✗ Abwesend'}
+                        {!teilnahme && '− Keine Antwort'}
+                      </span>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
+        {/* 選抜管理（管理者のみ） */}
+        {member.istAdmin && (
+          <div className="card">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">
+              ⭐ Aufstellung festlegen
+            </h2>
+
+            {/* 選抜状況のサマリー */}
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex gap-4 text-sm">
+                <div>
+                  <span className="font-semibold">Nominiert:</span>{' '}
+                  <span className={nominiertCount > 4 ? 'text-red-600 font-bold' : 'text-gray-900'}>
+                    {nominiertCount} / 4
+                  </span>
+                </div>
+                <div>
+                  <span className="font-semibold">Reserve:</span>{' '}
+                  <span className={reserveCount > 1 ? 'text-red-600 font-bold' : 'text-gray-900'}>
+                    {reserveCount} / 1
+                  </span>
+                </div>
+              </div>
+              {(nominiertCount > 4 || reserveCount > 1) && (
+                <p className="text-sm text-red-600 mt-2">
+                  ⚠️ Zu viele Spieler ausgewählt!
+                </p>
+              )}
+            </div>
+
+            {/* 選抜可能メンバー一覧 */}
+            <div className="space-y-2">
+              {verfuegbarTeilnahmen.length === 0 ? (
+                <p className="text-gray-500 text-sm">
+                  Keine verfügbaren Spieler
+                </p>
+              ) : (
+                verfuegbarTeilnahmen
+                  .sort((a, b) => {
+                    // 選抜順にソート
+                    const order = { nominiert: 0, reserve: 1, none: 2 };
+                    const aOrder = order[a.selectionStatus || 'none'];
+                    const bOrder = order[b.selectionStatus || 'none'];
+                    return aOrder - bOrder;
+                  })
+                  .map((teilnahme) => {
+                    const teilnahmeMember = members.find(m => m.id === teilnahme.mitgliedId);
+                    if (!teilnahmeMember) return null;
+
+                    return (
+                      <div
+                        key={teilnahme.id}
+                        className="flex items-center justify-between p-3 border-2 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+                      >
+                        {/* メンバー名 */}
+                        <div className="flex-1">
+                          <span className="font-medium text-gray-900">
+                            {teilnahmeMember.vorname} {teilnahmeMember.nachname}
+                          </span>
+                          {teilnahme.selectionStatus === 'nominiert' && (
+                            <span className="ml-2 text-green-600 text-sm">⭐</span>
+                          )}
+                          {teilnahme.selectionStatus === 'reserve' && (
+                            <span className="ml-2 text-blue-600 text-sm">🔄</span>
+                          )}
+                        </div>
+
+                        {/* 選抜ステータス選択 */}
+                        <select
+                          value={teilnahme.selectionStatus || 'none'}
+                          onChange={(e) =>
+                            handleSelectionChange(teilnahme.id, e.target.value as SelectionStatus)
+                          }
+                          className="px-3 py-2 border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 cursor-pointer"
+                        >
+                          <option value="none">—</option>
+                          <option value="nominiert">⭐ Nominiert</option>
+                          <option value="reserve">🔄 Reserve</option>
+                        </select>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
+
+            {/* ヒント */}
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-gray-700">
+                <strong>💡 Hinweis:</strong> Wähle bis zu 4 Nominierte und 1 Reserve aus.
+                Die Auswahl wird sofort gespeichert.
+              </p>
             </div>
           </div>
         )}
