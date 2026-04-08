@@ -67,9 +67,9 @@ export default function HomePage() {
 
             <button
               onClick={() => router.push('/login')}
-              className="w-full text-primary-600 hover:text-primary-700 font-medium py-3 text-sm"
+              className="btn-secondary w-full text-lg py-4"
             >
-              Bereits Mitglied? Hier anmelden →
+              🔑 Bereits Mitglied? Hier anmelden
             </button>
           </div>
 
