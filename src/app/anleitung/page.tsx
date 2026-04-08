@@ -1,6 +1,6 @@
 'use client';
 
-// Anleitung (使い方) ページ
+// Anleitung (使い方) ページ - 更新版
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -46,12 +46,14 @@ export default function AnleitungPage() {
               <li><strong>Zusage abgeben</strong> - Verfügbarkeit für jedes Spiel melden</li>
               <li><strong>Kommentare</strong> - Besondere Hinweise zu deiner Zusage hinzufügen</li>
               <li><strong>Spieldetails</strong> - Datum, Uhrzeit, Gegner und Ort einsehen</li>
+              <li><strong>Automatische Anmeldung</strong> - Nächstes Mal automatisch anmelden 🆕</li>
             </ul>
 
             <h3 className="text-xl font-semibold text-gray-800 mb-2">Für Teamleiter (Admin):</h3>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
               <li><strong>Spiele erstellen</strong> - Neue Spiele mit Datum, Zeit und Gegner anlegen</li>
               <li><strong>Alle Zusagen sehen</strong> - Übersicht über alle Teilnehmerzusagen</li>
+              <li><strong>Aufstellung festlegen</strong> - 4 Nominierte + 1 Reserve auswählen 🆕⭐</li>
               <li><strong>Heimspiel-Organisation</strong> - Mitbringsel zuweisen</li>
               <li><strong>Auswärtsspiel-Organisation</strong> - Fahrgemeinschaften planen</li>
               <li><strong>Mitgliederverwaltung</strong> - Neue Mitglieder hinzufügen oder deaktivieren</li>
@@ -81,13 +83,74 @@ export default function AnleitungPage() {
             </ol>
 
             <h3 className="text-xl font-semibold text-gray-800 mb-2">Anmelden (wenn du bereits Mitglied bist)</h3>
-            <ol className="list-decimal list-inside text-gray-700 space-y-1">
+            <ol className="list-decimal list-inside text-gray-700 space-y-1 mb-4">
               <li>Gehe zur App-Startseite</li>
-              <li>Klicke auf <strong>"Anmelden"</strong></li>
+              <li>Klicke auf <strong>"🔑 Bereits Mitglied? Hier anmelden"</strong></li>
               <li>Gib Nachname und Geburtsdatum ein</li>
+              <li><strong>🆕 Optional:</strong> Setze Häkchen bei <strong>"Nächstes Mal automatisch anmelden"</strong></li>
               <li>Wähle dein Team (falls mehrere)</li>
               <li>Klicke auf <strong>"Weiter"</strong></li>
             </ol>
+
+            <div className="bg-blue-50 border border-blue-200 rounded p-3 mt-3">
+              <p className="text-sm text-gray-700">
+                <strong>🆕 Automatische Anmeldung:</strong> Wenn du das Häkchen setzt, wirst du beim nächsten Besuch automatisch angemeldet. 
+                Deine Anmeldedaten werden sicher auf deinem Gerät gespeichert.
+              </p>
+            </div>
+          </section>
+
+          {/* NEU: Aufstellung festlegen */}
+          <section className="bg-green-50 border-2 border-green-200 rounded-lg p-6">
+            <h2 className="text-2xl font-bold text-green-900 mb-3">⭐ Aufstellung festlegen (nur Teamleiter) 🆕</h2>
+            
+            <p className="text-gray-700 mb-4">
+              Als Teamleiter kannst du für jedes Spiel die Aufstellung festlegen: <strong>4 Nominierte</strong> und <strong>1 Reserve</strong>.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">So funktioniert's:</h3>
+            <ol className="list-decimal list-inside text-gray-700 space-y-2 mb-4">
+              <li>Öffne ein <strong>Spiel</strong></li>
+              <li>Scrolle zu <strong>"⭐ Aufstellung festlegen"</strong></li>
+              <li>Du siehst alle Spieler mit Status <strong>"✓ Dabei"</strong></li>
+              <li>Wähle für jeden Spieler aus dem Dropdown-Menü:
+                <ul className="list-disc list-inside ml-6 mt-1 space-y-1">
+                  <li><strong>⭐ Nominiert</strong> - Spieler ist für das Spiel eingeteilt</li>
+                  <li><strong>🔄 Reserve</strong> - Spieler ist Ersatzspieler</li>
+                  <li><strong>—</strong> - Keine Auswahl</li>
+                </ul>
+              </li>
+              <li>Die Auswahl wird <strong>sofort automatisch gespeichert</strong></li>
+            </ol>
+
+            <div className="bg-white border border-green-300 rounded p-4 mb-4">
+              <p className="font-semibold text-gray-900 mb-2">Anzeige der Auswahl:</p>
+              <p className="text-sm text-gray-700 mb-1">
+                <strong>Nominiert:</strong> 3 / 4
+              </p>
+              <p className="text-sm text-gray-700">
+                <strong>Reserve:</strong> 1 / 1
+              </p>
+              <p className="text-sm text-gray-600 mt-2">
+                ⚠️ Wenn mehr als 4 Nominierte oder mehr als 1 Reserve ausgewählt sind, erscheint eine Warnung.
+              </p>
+            </div>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Was sehen andere Spieler?</h3>
+            <p className="text-gray-700 mb-2">
+              Im Abschnitt <strong>"Zusagen aller Mitglieder"</strong> sehen alle Teammitglieder die Auswahl:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-1 mb-4">
+              <li><strong>[⭐ Nominiert]</strong> - Grünes Badge neben dem Namen</li>
+              <li><strong>[🔄 Reserve]</strong> - Blaues Badge neben dem Namen</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Wichtige Hinweise:</h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-1">
+              <li>Die nominierten Spieler werden <strong>oben in der Liste</strong> angezeigt</li>
+              <li>Wenn ein Spieler seine Zusage auf <strong>"✗ Nicht dabei"</strong> ändert, wird die Auswahl automatisch entfernt</li>
+              <li>Nur Spieler mit Status <strong>"✓ Dabei"</strong> können ausgewählt werden</li>
+            </ul>
           </section>
 
           {/* Fahrgemeinschaften */}
@@ -148,33 +211,32 @@ export default function AnleitungPage() {
             <h3 className="text-xl font-semibold text-red-800 mb-2">⚠️ Team löschen</h3>
             <div className="bg-white border-2 border-red-300 rounded p-4 mb-3">
               <p className="font-bold text-red-900 mb-2">WICHTIG: Diese Aktion ist UNWIDERRUFLICH!</p>
-              <p className="text-gray-700 mb-2">Das Löschen entfernt dauerhaft:</p>
-              <ul className="list-disc list-inside text-gray-700 space-y-1">
+              <p className="text-gray-700 text-sm">
+                Wenn du ein Team löschst, werden <strong>ALLE Daten</strong> gelöscht:
+              </p>
+              <ul className="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
                 <li>Alle Mitglieder</li>
-                <li>Alle Spiele und Zusagen</li>
-                <li>Alle Heimspiel-Aufgaben</li>
+                <li>Alle Spiele</li>
+                <li>Alle Zusagen</li>
+                <li>Alle Aufstellungen 🆕</li>
                 <li>Alle Fahrgemeinschaften</li>
-                <li>Das gesamte Team</li>
+                <li>Alle Heimspiel-Mitbringsel</li>
               </ul>
             </div>
 
-            <p className="text-gray-700 mb-2"><strong>So löschst du ein Team:</strong></p>
-            <ol className="list-decimal list-inside text-gray-700 space-y-1 mb-4">
-              <li>Gehe zu <strong>"⚙️ Einstellungen"</strong></li>
-              <li>Scrolle zu <strong>"⚠️ Gefahrenzone"</strong></li>
-              <li>Klicke auf <strong>"Team löschen"</strong></li>
-              <li>Gib den exakten Teamnamen ein</li>
-              <li>Klicke auf <strong>"Endgültig löschen"</strong></li>
-              <li>Der Löschvorgang zeigt den Fortschritt (1/6 bis 6/6)</li>
-              <li>Nach erfolgreicher Löschung wirst du zur Startseite weitergeleitet</li>
+            <h3 className="text-xl font-semibold text-red-800 mb-2">So löschst du ein Team:</h3>
+            <ol className="list-decimal list-inside text-gray-700 space-y-1 mb-3">
+              <li>Gehe zu <strong>"⚙️ Team-Einstellungen"</strong></li>
+              <li>Scrolle nach unten zu <strong>"⚠️ Gefahrenzone"</strong></li>
+              <li>Klicke auf <strong>"🗑️ Team löschen"</strong></li>
+              <li>Gib zur Bestätigung den <strong>Teamnamen</strong> ein</li>
+              <li>Klicke auf <strong>"Ja, Team unwiderruflich löschen"</strong></li>
             </ol>
 
             <div className="bg-yellow-50 border border-yellow-300 rounded p-3">
-              <p className="font-semibold text-yellow-900 mb-1">💡 Alternative zum Löschen:</p>
               <p className="text-sm text-gray-700">
-                Wenn du nur die Saison beenden möchtest, musst du das Team NICHT löschen. 
-                Du kannst einfach alte Spiele löschen und neue anlegen. 
-                Das Team und alle Mitglieder bleiben erhalten.
+                <strong>💡 Alternative:</strong> Wenn du ein Team nur vorübergehend nicht nutzen möchtest, 
+                musst du es nicht löschen. Du kannst einfach keine neuen Spiele erstellen.
               </p>
             </div>
           </section>
@@ -182,11 +244,22 @@ export default function AnleitungPage() {
           {/* Tipps und Tricks */}
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">💡 Tipps und Tricks</h2>
-            <ul className="list-disc list-inside text-gray-700 space-y-2">
-              <li><strong>Zeitangabe ist optional</strong> - Leer lassen, wenn noch nicht festgelegt</li>
-              <li><strong>Mehrere Teams</strong> - Du kannst mehreren Teams angehören</li>
-              <li><strong>Passwort = Geburtsdatum</strong> - Teile es nicht mit Unbefugten</li>
-              <li><strong>Browser-Daten nicht löschen</strong> - Sonst musst du dich neu anmelden</li>
+            
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Für Teamleiter:</h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-1 mb-4">
+              <li><strong>Spiele frühzeitig anlegen:</strong> So haben die Spieler mehr Zeit zum Zusagen</li>
+              <li><strong>Aufstellung festlegen:</strong> Lege die Aufstellung fest, sobald genug Zusagen vorhanden sind 🆕</li>
+              <li><strong>Fahrer festlegen:</strong> Lege Fahrer fest, sobald klar ist, wer dabei ist</li>
+              <li><strong>Heimspiel-Mitbringsel:</strong> Weise Aufgaben frühzeitig zu</li>
+              <li><strong>Einladungscode teilen:</strong> Teile den Code per WhatsApp oder E-Mail</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Für alle Mitglieder:</h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-1">
+              <li><strong>Früh zusagen:</strong> So kann der Teamleiter besser planen</li>
+              <li><strong>Automatische Anmeldung nutzen:</strong> Spart Zeit beim nächsten Login 🆕</li>
+              <li><strong>Kommentar hinzufügen:</strong> Z.B. "Komme später" oder "Nur Doppel"</li>
+              <li><strong>Regelmäßig prüfen:</strong> Schau regelmäßig, ob neue Spiele angelegt wurden</li>
             </ul>
           </section>
 
@@ -194,49 +267,61 @@ export default function AnleitungPage() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">❓ Häufige Fragen</h2>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <p className="font-semibold text-gray-900">F: Ich habe meinen Einladungscode vergessen. Was nun?</p>
-                <p className="text-gray-700">A: Der Teamleiter findet den Code unter "⚙️ Einstellungen".</p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">Ich habe meinen Einladungscode vergessen. Was nun?</h3>
+                <p className="text-gray-700">
+                  Der Teamleiter kann den Code in den <strong>Team-Einstellungen</strong> einsehen und dir mitteilen.
+                </p>
               </div>
 
               <div>
-                <p className="font-semibold text-gray-900">F: Kann ich ein gelöschtes Team wiederherstellen?</p>
-                <p className="text-gray-700">A: Nein! Die Team-Löschung ist endgültig. Es gibt KEINE Wiederherstellungsmöglichkeit.</p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">Kann ich in mehreren Teams Mitglied sein?</h3>
+                <p className="text-gray-700">
+                  Ja! Du kannst mehreren Teams beitreten. Beim Anmelden wählst du dann aus, welches Team du sehen möchtest.
+                </p>
               </div>
 
               <div>
-                <p className="font-semibold text-gray-900">F: Kann ich die App auf dem Handy nutzen?</p>
-                <p className="text-gray-700">A: Ja! Die App ist für Mobilgeräte optimiert.</p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">🆕 Was passiert, wenn ich "Nicht dabei" wähle und vorher nominiert war?</h3>
+                <p className="text-gray-700">
+                  Deine Nominierung wird automatisch entfernt. Der Teamleiter muss dann einen anderen Spieler nominieren.
+                </p>
               </div>
 
               <div>
-                <p className="font-semibold text-gray-900">F: Werden andere Teams meine Daten sehen können?</p>
-                <p className="text-gray-700">A: Nein. Jedes Team ist komplett isoliert.</p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">Wie kann ich meine Zusage ändern?</h3>
+                <p className="text-gray-700">
+                  Öffne das Spiel erneut, wähle einen neuen Status und klicke auf <strong>"Speichern"</strong>.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">Kann ich ein Spiel nachträglich bearbeiten?</h3>
+                <p className="text-gray-700">
+                  Ja, als Teamleiter kannst du auf <strong>"⚙️ Spiel verwalten"</strong> klicken und dann <strong>"✏️ Bearbeiten"</strong> wählen.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">🆕 Wo finde ich die automatische Anmeldung?</h3>
+                <p className="text-gray-700">
+                  Beim Anmelden auf der Login-Seite gibt es das Häkchen <strong>"Nächstes Mal automatisch anmelden"</strong>. 
+                  Setze es vor dem Klick auf "Weiter".
+                </p>
               </div>
             </div>
           </section>
 
-          {/* Datenschutz */}
-          <section className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-blue-900 mb-3">🔒 Datenschutz und Sicherheit</h2>
-            <ul className="list-disc list-inside text-gray-700 space-y-1">
-              <li>Alle Daten sind in der Cloud gespeichert (Google Firebase)</li>
-              <li>Nur Teammitglieder haben Zugriff auf Teamdaten</li>
-              <li>Jedes Team ist komplett getrennt</li>
-              <li>Sichere Verbindung über HTTPS</li>
-              <li>Teile deinen Einladungscode nur mit vertrauenswürdigen Personen</li>
-            </ul>
-          </section>
-
-          {/* Support */}
+          {/* Probleme und Support */}
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">📞 Support</h2>
-            <p className="text-gray-700">Bei Problemen oder Fragen:</p>
-            <ul className="list-disc list-inside text-gray-700 space-y-1 mt-2 mb-4">
-              <li>Kontaktiere deinen Teamleiter</li>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">🆘 Probleme und Support</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Die App lädt nicht / zeigt Fehler</h3>
+            <ul className="list-disc list-inside text-gray-700 space-y-1 mb-4">
               <li>Prüfe deine Internetverbindung</li>
-              <li>Aktualisiere die Seite (F5 oder Strg+R)</li>
+              <li>Lade die Seite neu (F5 oder Aktualisieren-Button)</li>
+              <li>Lösche Browser-Cache und Cookies</li>
               <li>Versuche einen anderen Browser</li>
             </ul>
             
@@ -262,7 +347,7 @@ export default function AnleitungPage() {
               Entwickelt mit ❤️ für die nuLiga-Community.
             </p>
             <p className="text-sm text-gray-600 mt-3">
-              <strong>Version 2.0</strong> - Mit Team-Verwaltung und verbesserter Benutzerfreundlichkeit
+              <strong>Version 2.1</strong> - Mit Aufstellung, Auto-Login und vielen Verbesserungen 🆕
             </p>
           </section>
 
