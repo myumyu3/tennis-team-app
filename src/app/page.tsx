@@ -42,7 +42,17 @@ export default function HomePage() {
           <div className="text-center text-white px-4">
             <h1 className="text-5xl md:text-6xl font-bold mb-4">🎾</h1>
             <h2 className="text-4xl md:text-5xl font-bold mb-3">Tennis Team Manager</h2>
-            <p className="text-xl md:text-2xl">Willkommen! Wie möchtest du starten?</p>
+            <p className="text-xl md:text-2xl mb-6">Willkommen! Wie möchtest du starten?</p>
+            
+            {/* アプリの説明 */}
+            <div className="mt-6 max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl font-medium mb-2 drop-shadow-lg">
+                Hier kannst du einfach sehen, wer zum nächsten Spiel kommt.
+              </p>
+              <p className="text-base md:text-lg text-white/90 drop-shadow-md">
+                Speziell für unsere Punktspiele entwickelt.
+              </p>
+            </div>
           </div>
         </div>
       </div>
