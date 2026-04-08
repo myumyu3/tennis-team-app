@@ -148,24 +148,21 @@ export default function MembersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
-          <button onClick={() => router.push('/matches')} className="text-primary-600 hover:text-primary-700 font-medium mb-2">
+      <header 
+        className="shadow-sm sticky top-0 z-10 relative"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/tennisclub3.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <button onClick={() => router.push('/matches')} className="text-white/90 hover:text-white font-medium mb-3 bg-black/20 hover:bg-black/30 px-3 py-1 rounded backdrop-blur-sm transition-all inline-block">
             ← Zurück zur Übersicht
           </button>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">👥 Mitgliederverwaltung</h1>
-              <p className="text-sm text-gray-600 mt-1">{team.name}</p>
-            </div>
-            <button
-              onClick={() => router.push('/settings')}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center gap-2"
-            >
-              <span>⚙️</span>
-              <span className="hidden sm:inline">Einstellungen</span>
-            </button>
-          </div>
+          <h1 className="text-3xl font-bold text-white drop-shadow-lg">👥 Mitgliederverwaltung</h1>
+          <p className="text-sm text-white mt-2 font-medium drop-shadow-md">{team.name}</p>
         </div>
       </header>
 

@@ -153,22 +153,30 @@ export default function MatchesPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* ヘッダー */}
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+      <header 
+        className="shadow-sm sticky top-0 z-10 relative"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/tennisclub3.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">🎾 Meine Spiele</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg">🎾 Meine Spiele</h1>
+              <p className="text-sm text-white mt-2 font-medium drop-shadow-md">
                 {team.name}
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-white/90 drop-shadow-md">
                 {member.vorname} {member.nachname}
-                {member.istAdmin && <span className="ml-2 text-primary-600 font-semibold">(Teamleiter)</span>}
+                {member.istAdmin && <span className="ml-2 text-primary-300 font-semibold">(Teamleiter)</span>}
               </p>
             </div>
             <button
               onClick={handleLogout}
-              className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+              className="text-sm text-white hover:text-primary-200 font-medium bg-black/20 hover:bg-black/30 px-4 py-2 rounded-lg backdrop-blur-sm transition-all"
             >
               Abmelden
             </button>
