@@ -24,10 +24,24 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-		const germanDate = convertIsoToGerman(geburtsdatum);
-		console.log('🔍 入力値:', geburtsdatum);
-		console.log('🔍 変換後:', germanDate);
-		console.log('🔍 苗字:', nachname);
+      // 日付の検証と変換
+      if (!geburtsdatum || !geburtsdatum.includes('-')) {
+        setError('Bitte gib ein gültiges Geburtsdatum ein.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      const germanDate = convertIsoToGerman(geburtsdatum);
+      
+      // 変換後の形式を検証
+      if (!germanDate || germanDate.split('.').length !== 3) {
+        setError('Ungültiges Datumsformat. Bitte verwende den Kalender.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      console.log('Login attempt:', { nachname, germanDate }); // デバッグログ
+
       const result = await authLogin(nachname, germanDate);
 
       if (!result) {
