@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { login as authLogin, convertIsoToGerman } from '@/lib/auth';
@@ -17,6 +17,42 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<'credentials' | 'team-select'>('credentials');
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // ページロード時：保存されたログイン情報があれば自動ログイン
+  useEffect(() => {
+    const savedNachname = localStorage.getItem('tennisRememberNachname');
+    const savedGeburtsdatum = localStorage.getItem('tennisRememberGeburtsdatum');
+    
+    if (savedNachname && savedGeburtsdatum) {
+      // 保存された情報がある場合、自動的にログイン処理を実行
+      setNachname(savedNachname);
+      setGeburtsdatum(savedGeburtsdatum);
+      setRememberMe(true);
+      
+      // 自動ログインを実行
+      autoLogin(savedNachname, savedGeburtsdatum);
+    }
+  }, []);
+
+  // 自動ログイン処理
+  const autoLogin = async (savedNachname: string, savedGeburtsdatum: string) => {
+    try {
+      const germanDate = convertIsoToGerman(savedGeburtsdatum);
+      const result = await authLogin(savedNachname, germanDate);
+
+      if (result?.member && result?.team) {
+        login(result.member, result.team);
+        router.push('/matches');
+      } else if (result?.teams && result.teams.length > 0) {
+        setAvailableTeams(result.teams);
+        setStep('team-select');
+      }
+    } catch (err) {
+      console.error('Auto login error:', err);
+      // 自動ログイン失敗時は何もしない（手動ログインできる状態にする）
+    }
+  };
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +86,15 @@ export default function LoginPage() {
         setError('Nachname oder Geburtsdatum falsch, oder du bist in keinem Team.');
         setIsSubmitting(false);
         return;
+      }
+
+      // ログイン情報を保存または削除
+      if (rememberMe) {
+        localStorage.setItem('tennisRememberNachname', cleanNachname);
+        localStorage.setItem('tennisRememberGeburtsdatum', cleanGeburtsdatum);
+      } else {
+        localStorage.removeItem('tennisRememberNachname');
+        localStorage.removeItem('tennisRememberGeburtsdatum');
       }
 
       if (result.member && result.team) {
@@ -129,6 +174,19 @@ export default function LoginPage() {
                   required
                   max={new Date().toISOString().split('T')[0]}
                 />
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                />
+                <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-700">
+                  Nächstes Mal automatisch anmelden
+                </label>
               </div>
 
               {error && (
