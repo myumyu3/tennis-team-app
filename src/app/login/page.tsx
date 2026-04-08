@@ -24,6 +24,9 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
+      // デバッグ: 入力値を確認
+      alert(`入力された日付: ${geburtsdatum}\n型: ${typeof geburtsdatum}`);
+
       // 日付の検証と変換
       if (!geburtsdatum || !geburtsdatum.includes('-')) {
         setError('Bitte gib ein gültiges Geburtsdatum ein.');
@@ -32,6 +35,9 @@ export default function LoginPage() {
       }
 
       const germanDate = convertIsoToGerman(geburtsdatum);
+      
+      // デバッグ: 変換後の日付を確認
+      alert(`変換後: ${germanDate}`);
       
       // 変換後の形式を検証
       if (!germanDate || germanDate.split('.').length !== 3) {
@@ -61,6 +67,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error('Login error:', err);
+      alert(`エラー: ${err}`);
       setError('Ein Fehler ist aufgetreten.');
     } finally {
       setIsSubmitting(false);
