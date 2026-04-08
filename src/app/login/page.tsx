@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     try {
       // デバッグ: 入力値を確認
-      alert(`入力された日付: ${geburtsdatum}\n型: ${typeof geburtsdatum}`);
+      alert(`【1】入力\nNachname: ${nachname}\n日付: ${geburtsdatum}\n型: ${typeof geburtsdatum}`);
 
       // 日付の検証と変換
       if (!geburtsdatum || !geburtsdatum.includes('-')) {
@@ -37,7 +37,7 @@ export default function LoginPage() {
       const germanDate = convertIsoToGerman(geburtsdatum);
       
       // デバッグ: 変換後の日付を確認
-      alert(`変換後: ${germanDate}`);
+      alert(`【2】変換後\n${germanDate}\n長さ: ${germanDate.length}`);
       
       // 変換後の形式を検証
       if (!germanDate || germanDate.split('.').length !== 3) {
@@ -50,11 +50,15 @@ export default function LoginPage() {
 
       const result = await authLogin(nachname, germanDate);
 
+      // デバッグ: 検索結果
       if (!result) {
+        alert(`【3】検索失敗\nNachname: ${nachname}\nGeburtsdatum: ${germanDate}\n\nFirestoreで見つかりませんでした。`);
         setError('Nachname oder Geburtsdatum falsch, oder du bist in keinem Team.');
         setIsSubmitting(false);
         return;
       }
+
+      alert(`【4】検索成功！\nチーム数: ${result.teams?.length || 0}`);
 
       if (result.member && result.team) {
         login(result.member, result.team);
@@ -67,7 +71,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error('Login error:', err);
-      alert(`エラー: ${err}`);
+      alert(`【エラー】\n${err}`);
       setError('Ein Fehler ist aufgetreten.');
     } finally {
       setIsSubmitting(false);
