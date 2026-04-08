@@ -87,6 +87,14 @@ export default function HomePage() {
       {/* フッター */}
       <footer className="bg-white border-t border-gray-200 py-6">
         <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="mb-3">
+            <button
+              onClick={() => router.push('/anleitung')}
+              className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+            >
+              📖 Anleitung
+            </button>
+          </div>
           <p className="text-sm text-gray-600 flex items-center justify-center gap-2">
             <Image
               src="/images/heritage_logo_small.jpg"
