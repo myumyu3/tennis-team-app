@@ -90,6 +90,50 @@ export default function AnleitungPage() {
             </ol>
           </section>
 
+          {/* Fahrgemeinschaften */}
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">🚗 Auswärtsspiel - Fahrgemeinschaften</h2>
+            
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Für Teamleiter: Fahrer festlegen</h3>
+            <ol className="list-decimal list-inside text-gray-700 space-y-1 mb-4">
+              <li>Öffne ein <strong>Auswärtsspiel</strong></li>
+              <li>Scrolle zu <strong>"Auswärtsspiel - Fahrgemeinschaften"</strong></li>
+              <li>Wähle Fahrer aus (Häkchen setzen ☑)</li>
+              <li>Gib die Anzahl freier Plätze an (0-7)</li>
+              <li>Klicke auf <strong>"Fahrerzuteilung speichern"</strong></li>
+            </ol>
+
+            <div className="bg-gray-50 border border-gray-300 rounded p-3 mb-4">
+              <p className="text-sm text-gray-700">
+                <strong>Beispiel:</strong> Hans Müller mit 4 freien Plätzen, Peter Klein mit 2 freien Plätzen
+              </p>
+            </div>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Für alle Mitglieder: Verfügbare Fahrer sehen</h3>
+            <p className="text-gray-700 mb-2">
+              Wenn du ein Auswärtsspiel öffnest, siehst du im Abschnitt <strong>"🚗 Verfügbare Fahrer"</strong> alle Fahrer und ihre freien Plätze.
+            </p>
+
+            <h3 className="text-xl font-semibold text-gray-800 mb-2 mt-4">Als Fahrer austragen</h3>
+            <p className="text-gray-700 mb-2">
+              Wenn du als Fahrer eingetragen bist, aber doch nicht fahren kannst:
+            </p>
+            <ol className="list-decimal list-inside text-gray-700 space-y-1 mb-4">
+              <li>Öffne das Auswärtsspiel</li>
+              <li>Im Abschnitt <strong>"🚗 Verfügbare Fahrer"</strong> siehst du deine Eintragung mit <strong>(Du)</strong></li>
+              <li>Klicke auf <strong>"❌ Austragen"</strong></li>
+              <li>Bestätige die Frage</li>
+              <li>Du wirst als Fahrer entfernt</li>
+            </ol>
+
+            <div className="bg-yellow-50 border border-yellow-300 rounded p-3">
+              <p className="text-sm text-gray-700">
+                <strong>💡 Hinweis:</strong> Nur du selbst kannst dich austragen. 
+                Der Teamleiter kann dich auch entfernen, indem er die Fahrerzuteilung neu speichert.
+              </p>
+            </div>
+          </section>
+
           {/* Team-Einstellungen und Löschen */}
           <section className="bg-red-50 border border-red-200 rounded-lg p-6">
             <h2 className="text-2xl font-bold text-red-900 mb-3">⚙️ Team-Einstellungen und Löschen (nur Teamleiter)</h2>

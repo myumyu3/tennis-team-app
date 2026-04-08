@@ -77,20 +77,44 @@ export default function MatchDetailPage() {
           setKommentar(teilnahme.kommentar || '');
         }
 
-        // 管理者の場合は追加データ取得
-        if (member.istAdmin) {
-          // 全メンバー取得
-          const membersSnapshot = await getDocs(query(
-            collection(db, 'members'),
+        // 全メンバー取得（運転手名表示のため、全ユーザーに必要）
+        const membersSnapshot = await getDocs(query(
+          collection(db, 'members'),
+          where('teamId', '==', team.id),
+          where('aktiv', '==', true)
+        ));
+        const membersData = membersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        } as Member));
+        setMembers(membersData);
+
+        // Gastspielの場合は運転手情報を取得（全ユーザーが見られる）
+        if (!matchData.istHeimspiel) {
+          const gastQuery = query(
+            collection(db, 'gast_spiel_autos'),
             where('teamId', '==', team.id),
-            where('aktiv', '==', true)
-          ));
-          const membersData = membersSnapshot.docs.map(doc => ({
+            where('spielId', '==', matchId)
+          );
+          const gastSnapshot = await getDocs(gastQuery);
+          const gastData = gastSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
-          } as Member));
-          setMembers(membersData);
+          } as GastSpielAuto));
+          setGastAutos(gastData);
+          
+          // 既存のドライバー情報をselectedDriversにセット（管理者用）
+          if (member.istAdmin) {
+            const drivers: {[key: string]: number} = {};
+            gastData.forEach(auto => {
+              drivers[auto.fahrerId] = auto.freiePlaetze;
+            });
+            setSelectedDrivers(drivers);
+          }
+        }
 
+        // 管理者の場合は追加データ取得
+        if (member.istAdmin) {
           // 全員の回答取得
           const allTeilnahmenQuery = query(
             collection(db, 'teilnahmen'),
@@ -118,26 +142,6 @@ export default function MatchDetailPage() {
               ...doc.data()
             } as HeimSpielAufgabe));
             setHeimAufgaben(heimData);
-          } else {
-            // Gast の場合は車割り当て取得
-            const gastQuery = query(
-              collection(db, 'gast_spiel_autos'),
-              where('teamId', '==', team.id),
-              where('spielId', '==', matchId)
-            );
-            const gastSnapshot = await getDocs(gastQuery);
-            const gastData = gastSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            } as GastSpielAuto));
-            setGastAutos(gastData);
-            
-            // 既存のドライバー情報をselectedDriversにセット
-            const drivers: {[key: string]: number} = {};
-            gastData.forEach(auto => {
-              drivers[auto.fahrerId] = auto.freiePlaetze;
-            });
-            setSelectedDrivers(drivers);
           }
         }
       } catch (error) {
@@ -281,6 +285,20 @@ export default function MatchDetailPage() {
       alert('Fehler beim Speichern');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Gastspiel 車管理 - 運転手自身が削除
+  const handleRemoveMyself = async (autoId: string) => {
+    if (!member || !confirm('Möchtest du dich als Fahrer austragen?')) return;
+    
+    try {
+      await deleteDoc(doc(db, 'gast_spiel_autos', autoId));
+      alert('Du wurdest als Fahrer ausgetragen.');
+      window.location.reload();
+    } catch (error) {
+      console.error('Error removing driver:', error);
+      alert('Fehler beim Austragen');
     }
   };
 
@@ -566,6 +584,48 @@ export default function MatchDetailPage() {
                 Wähle mindestens einen Fahrer aus
               </p>
             )}
+          </div>
+        )}
+
+        {/* Gastspiel: 運転手一覧（全ユーザー向け） */}
+        {!match.istHeimspiel && !member.istAdmin && gastAutos.length > 0 && (
+          <div className="card">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">🚗 Verfügbare Fahrer</h2>
+            
+            <div className="space-y-3">
+              {gastAutos.map(auto => {
+                const driver = members.find(m => m.id === auto.fahrerId);
+                const isMyself = member.id === auto.fahrerId;
+                
+                return (
+                  <div 
+                    key={auto.id} 
+                    className={`border-2 rounded-lg p-4 ${isMyself ? 'bg-blue-50 border-blue-300' : 'bg-white'}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {driver ? `${driver.vorname} ${driver.nachname}` : 'Unbekannt'}
+                          {isMyself && <span className="ml-2 text-sm text-blue-600">(Du)</span>}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {auto.freiePlaetze} {auto.freiePlaetze === 1 ? 'freier Platz' : 'freie Plätze'}
+                        </p>
+                      </div>
+                      
+                      {isMyself && (
+                        <button
+                          onClick={() => handleRemoveMyself(auto.id)}
+                          className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium"
+                        >
+                          ❌ Austragen
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </main>

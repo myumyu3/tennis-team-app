@@ -84,7 +84,7 @@ export default function ManageMatchesPage() {
       await addDoc(collection(db, 'matches'), {
         teamId: team.id,
         datum: germanDate,
-        uhrzeit: formData.uhrzeit || undefined, // 空の場合はundefined
+        uhrzeit: formData.uhrzeit || '', // 空の場合は空文字列
         gegner: formData.gegner,
         istHeimspiel: formData.istHeimspiel,
         ort: formData.ort
@@ -121,7 +121,7 @@ export default function ManageMatchesPage() {
       
       await updateDoc(doc(db, 'matches', editingMatch.id), {
         datum: germanDate,
-        uhrzeit: formData.uhrzeit || undefined,
+        uhrzeit: formData.uhrzeit || '', // 空の場合は空文字列
         gegner: formData.gegner,
         istHeimspiel: formData.istHeimspiel,
         ort: formData.ort
