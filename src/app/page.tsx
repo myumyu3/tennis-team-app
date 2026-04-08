@@ -31,7 +31,7 @@ export default function HomePage() {
       {/* ヒーローセクション - 背景画像 */}
       <div className="relative h-[400px] md:h-[500px] w-full">
         <Image
-          src="/images/tennisclub.jpg"
+          src="/images/tennisclub4.jpg"
           alt="Tennis Court"
           fill
           className="object-cover"
