@@ -80,6 +80,14 @@ export default function LoginPage() {
         return;
       }
 
+      // デバッグ用ログ（開発者ツールのコンソールで確認可能）
+      console.log('🔍 ログイン試行:', {
+        入力_Nachname: nachname,
+        クリーン_Nachname: cleanNachname,
+        入力_Geburtsdatum: geburtsdatum,
+        変換後_Geburtsdatum: germanDate
+      });
+
       const result = await authLogin(cleanNachname, germanDate);
 
       if (!result) {
@@ -161,7 +169,14 @@ export default function LoginPage() {
             <form onSubmit={handleCredentialsSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Nachname</label>
-                <input type="text" value={nachname} onChange={(e) => setNachname(e.target.value)} className="input-field" required />
+                <input 
+                  type="text" 
+                  value={nachname} 
+                  onChange={(e) => setNachname(e.target.value)} 
+                  onBlur={(e) => setNachname(e.target.value.trim())}
+                  className="input-field" 
+                  required 
+                />
               </div>
 
               <div>

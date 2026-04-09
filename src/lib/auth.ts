@@ -300,6 +300,18 @@ export function convertIsoToGerman(isoDate: string): string {
   // トリムして余分な空白を削除
   isoDate = isoDate.trim();
 
+  // 既にドイツ形式（DD.MM.YYYY）の場合はそのまま返す
+  if (isoDate.includes('.')) {
+    const parts = isoDate.split('.');
+    if (parts.length === 3) {
+      const [day, month, year] = parts;
+      // 月と日が2桁になるようにパディング
+      const paddedMonth = month.padStart(2, '0');
+      const paddedDay = day.padStart(2, '0');
+      return `${paddedDay}.${paddedMonth}.${year}`;
+    }
+  }
+
   // YYYY-MM-DD 形式かチェック
   const parts = isoDate.split('-');
   if (parts.length !== 3) {

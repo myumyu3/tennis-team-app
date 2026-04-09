@@ -68,7 +68,7 @@ export default function MembersPage() {
       const q = query(
         collection(db, 'members'),
         where('teamId', '==', team.id),
-        where('nachname', '==', formData.nachname),
+        where('nachname', '==', formData.nachname.trim()),
         where('geburtsdatum', '==', germanDate)
       );
       const existingMembers = await getDocs(q);
@@ -81,8 +81,8 @@ export default function MembersPage() {
 
       await addDoc(collection(db, 'members'), {
         teamId: team.id,
-        nachname: formData.nachname,
-        vorname: formData.vorname,
+        nachname: formData.nachname.trim(),
+        vorname: formData.vorname.trim(),
         geburtsdatum: germanDate,
         istAdmin: formData.istAdmin,
         aktiv: formData.aktiv
@@ -179,12 +179,26 @@ export default function MembersPage() {
             <form onSubmit={handleAddMember} className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Vorname *</label>
-                <input type="text" value={formData.vorname} onChange={(e) => setFormData({ ...formData, vorname: e.target.value })} className="input-field" required />
+                <input 
+                  type="text" 
+                  value={formData.vorname} 
+                  onChange={(e) => setFormData({ ...formData, vorname: e.target.value })} 
+                  onBlur={(e) => setFormData({ ...formData, vorname: e.target.value.trim() })}
+                  className="input-field" 
+                  required 
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Nachname *</label>
-                <input type="text" value={formData.nachname} onChange={(e) => setFormData({ ...formData, nachname: e.target.value })} className="input-field" required />
+                <input 
+                  type="text" 
+                  value={formData.nachname} 
+                  onChange={(e) => setFormData({ ...formData, nachname: e.target.value })} 
+                  onBlur={(e) => setFormData({ ...formData, nachname: e.target.value.trim() })}
+                  className="input-field" 
+                  required 
+                />
               </div>
 
               <div>

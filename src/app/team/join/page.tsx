@@ -81,12 +81,26 @@ export default function JoinTeamPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Vorname *</label>
-                  <input type="text" value={vorname} onChange={(e) => setVorname(e.target.value)} className="input-field" required />
+                  <input 
+                    type="text" 
+                    value={vorname} 
+                    onChange={(e) => setVorname(e.target.value)} 
+                    onBlur={(e) => setVorname(e.target.value.trim())}
+                    className="input-field" 
+                    required 
+                  />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Nachname *</label>
-                  <input type="text" value={nachname} onChange={(e) => setNachname(e.target.value)} className="input-field" required />
+                  <input 
+                    type="text" 
+                    value={nachname} 
+                    onChange={(e) => setNachname(e.target.value)} 
+                    onBlur={(e) => setNachname(e.target.value.trim())}
+                    className="input-field" 
+                    required 
+                  />
                 </div>
 
                 <div>

@@ -98,6 +98,7 @@ export default function CreateTeamPage() {
                     type="text"
                     value={vorname}
                     onChange={(e) => setVorname(e.target.value)}
+                    onBlur={(e) => setVorname(e.target.value.trim())}
                     className="input-field"
                     placeholder="Dein Vorname"
                     required
@@ -113,6 +114,7 @@ export default function CreateTeamPage() {
                     type="text"
                     value={nachname}
                     onChange={(e) => setNachname(e.target.value)}
+                    onBlur={(e) => setNachname(e.target.value.trim())}
                     className="input-field"
                     placeholder="Dein Nachname"
                     required
