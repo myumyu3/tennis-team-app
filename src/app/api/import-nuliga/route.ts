@@ -12,20 +12,51 @@ interface Match {
 
 export async function POST(request: NextRequest) {
   try {
-    const { url } = await request.json();
+    const { url: inputUrl } = await request.json();
 
-    if (!url || !url.includes('liga.nu')) {
+    if (!inputUrl) {
       return NextResponse.json(
-        { error: 'Ungültige nuLiga URL' },
+        { error: 'Bitte gib eine URL ein' },
         { status: 400 }
       );
     }
 
-    // nuLigaページを取得
-    const response = await fetch(url);
+    // URLを正規化（プロトコルが欠けている場合は自動補完）
+    let url = inputUrl.trim();
+    
+    // プロトコルがない場合は追加
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      // liga.nuドメインの場合はhttpsを追加
+      if (url.includes('liga.nu')) {
+        url = 'https://' + url;
+      } else {
+        return NextResponse.json(
+          { error: 'Ungültige URL. Bitte kopiere die vollständige URL von nuLiga (z.B. https://wtv.liga.nu/...)' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // nuLigaのURLかチェック
+    if (!url.includes('liga.nu')) {
+      return NextResponse.json(
+        { error: 'Bitte gib eine gültige nuLiga URL ein (wtv.liga.nu, tnb.liga.nu, htv.liga.nu, etc.)' },
+        { status: 400 }
+      );
+    }
+
+    // nuLigaページを取得（ブラウザのように振る舞う）
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7',
+      }
+    });
+    
     if (!response.ok) {
       return NextResponse.json(
-        { error: 'Fehler beim Abrufen der nuLiga-Seite' },
+        { error: `Fehler beim Abrufen der nuLiga-Seite (Status: ${response.status})` },
         { status: 500 }
       );
     }
@@ -35,8 +66,12 @@ export async function POST(request: NextRequest) {
     // チーム名を抽出
     const teamNameMatch = html.match(/<h1[^>]*>([^<]+)<\/h1>/);
     if (!teamNameMatch) {
+      // デバッグ: タイトルタグも試す
+      const titleMatch = html.match(/<title>([^<]+)<\/title>/);
+      const debugInfo = titleMatch ? `Gefundener Titel: ${titleMatch[1]}` : 'Kein Titel gefunden';
+      
       return NextResponse.json(
-        { error: 'Teamname konnte nicht gefunden werden' },
+        { error: `Teamname konnte nicht gefunden werden. ${debugInfo}. Bitte überprüfe, ob die URL zur Mannschaftsseite führt.` },
         { status: 400 }
       );
     }
