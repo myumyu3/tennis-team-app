@@ -102,13 +102,30 @@ export async function POST(request: NextRequest) {
     if (!teamName) {
       // デバッグ: タイトルタグも試す
       const titleMatch = html.match(/<title>([^<]+)<\/title>/);
-      const debugInfo = titleMatch ? `Gefundener Titel: ${titleMatch[1]}` : 'Kein Titel gefunden';
+      const debugInfo = titleMatch ? `Titel: ${titleMatch[1]}` : 'Kein Titel';
       
-      // HTMLの最初の部分も表示（デバッグ用）
-      const htmlPreview = html.substring(0, 500).replace(/\n/g, ' ');
+      // h1タグの有無を確認
+      const h1Count = (html.match(/<h1/g) || []).length;
+      
+      // Vereinセクションの有無を確認
+      const vereinExists = html.includes('<strong>Verein</strong>');
+      
+      // Mannschaftセクションの有無を確認
+      const mannschaftExists = html.includes('<strong>Mannschaft</strong>');
+      
+      // HTMLの長さ
+      const htmlLength = html.length;
+      
+      const debugDetails = `
+        ${debugInfo} | 
+        HTML-Länge: ${htmlLength} Zeichen | 
+        H1-Tags gefunden: ${h1Count} | 
+        Verein-Sektion: ${vereinExists ? 'Ja' : 'Nein'} | 
+        Mannschaft-Sektion: ${mannschaftExists ? 'Ja' : 'Nein'}
+      `.trim();
       
       return NextResponse.json(
-        { error: `Teamname konnte nicht gefunden werden. ${debugInfo}. HTML-Vorschau: ${htmlPreview}` },
+        { error: `Teamname konnte nicht gefunden werden. Debug: ${debugDetails}` },
         { status: 400 }
       );
     }
