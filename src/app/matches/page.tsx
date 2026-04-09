@@ -321,6 +321,12 @@ export default function MatchesPage() {
         {member.istAdmin && (
           <div className="mt-8 space-y-3">
             <button
+              onClick={() => router.push('/matches/import')}
+              className="btn-primary w-full"
+            >
+              📥 Spiele von nuLiga importieren
+            </button>
+            <button
               onClick={() => router.push('/members')}
               className="btn-secondary w-full"
             >
