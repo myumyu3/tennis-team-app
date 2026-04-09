@@ -58,25 +58,62 @@ export default function MatchesPage() {
             return dateA.getTime() - dateB.getTime();
           });
 
-        // 各試合に対する自分の回答を取得
+        // 各試合に対する自分の回答と全員の参加状況を取得
         const matchesWithTeilnahme: MatchWithTeilnahme[] = await Promise.all(
           matchesData.map(async (match) => {
             const teilnahmenRef = collection(db, 'teilnahmen');
-            const teilnahmeQuery = query(
+            
+            // 自分の回答を取得
+            const meineTeilnahmeQuery = query(
               teilnahmenRef,
               where('teamId', '==', team.id),
               where('spielId', '==', match.id),
               where('mitgliedId', '==', member.id)
             );
-            const teilnahmeSnapshot = await getDocs(teilnahmeQuery);
-            
-            const meineTeilnahme = teilnahmeSnapshot.empty 
+            const meineTeilnahmeSnapshot = await getDocs(meineTeilnahmeQuery);
+            const meineTeilnahme = meineTeilnahmeSnapshot.empty 
               ? undefined 
-              : { id: teilnahmeSnapshot.docs[0].id, ...teilnahmeSnapshot.docs[0].data() } as Teilnahme;
+              : { id: meineTeilnahmeSnapshot.docs[0].id, ...meineTeilnahmeSnapshot.docs[0].data() } as Teilnahme;
+
+            // 全員の回答を取得して集計
+            const allTeilnahmenQuery = query(
+              teilnahmenRef,
+              where('teamId', '==', team.id),
+              where('spielId', '==', match.id)
+            );
+            const allTeilnahmenSnapshot = await getDocs(allTeilnahmenQuery);
+            
+            // statusごとに集計
+            let totalVerfuegbar = 0;
+            let totalNurDoppel = 0;
+            let totalVielleicht = 0;
+            let totalNichtVerfuegbar = 0;
+            
+            allTeilnahmenSnapshot.docs.forEach(doc => {
+              const teilnahme = doc.data() as Teilnahme;
+              switch (teilnahme.status) {
+                case 'verfuegbar':
+                  totalVerfuegbar++;
+                  break;
+                case 'nur_doppel':
+                  totalNurDoppel++;
+                  break;
+                case 'vielleicht':
+                  totalVielleicht++;
+                  break;
+                case 'nicht_verfuegbar':
+                  totalNichtVerfuegbar++;
+                  break;
+              }
+            });
 
             return {
               ...match,
-              meineTeilnahme
+              meineTeilnahme,
+              totalVerfuegbar,
+              totalNurDoppel,
+              totalVielleicht,
+              totalNichtVerfuegbar
             };
           })
         );
@@ -229,6 +266,33 @@ export default function MatchesPage() {
                       <div className="flex items-center gap-2">
                         <span>📍</span>
                         <span>{match.ort}</span>
+                      </div>
+                      
+                      {/* 参加者数の表示 */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <span>👥</span>
+                        <div className="flex gap-3 text-xs">
+                          {(match.totalVerfuegbar || 0) > 0 && (
+                            <span className="text-green-700 font-semibold">
+                              ✓ {match.totalVerfuegbar}
+                            </span>
+                          )}
+                          {(match.totalVielleicht || 0) > 0 && (
+                            <span className="text-yellow-700 font-semibold">
+                              ? {match.totalVielleicht}
+                            </span>
+                          )}
+                          {(match.totalNichtVerfuegbar || 0) > 0 && (
+                            <span className="text-red-700 font-semibold">
+                              ✗ {match.totalNichtVerfuegbar}
+                            </span>
+                          )}
+                          {!match.totalVerfuegbar && !match.totalVielleicht && !match.totalNichtVerfuegbar && (
+                            <span className="text-gray-500">
+                              Keine Zusagen
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
