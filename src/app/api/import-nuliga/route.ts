@@ -63,22 +63,60 @@ export async function POST(request: NextRequest) {
 
     const html = await response.text();
 
-    // チーム名を抽出
-    const teamNameMatch = html.match(/<h1[^>]*>([^<]+)<\/h1>/);
-    if (!teamNameMatch) {
+    // チーム名を抽出（複数の方法を試す）
+    let teamName = '';
+    let fullTeamName = '';
+    
+    // 方法1: h1タグから
+    const h1Match = html.match(/<h1[^>]*>([^<]+)<\/h1>/);
+    if (h1Match) {
+      fullTeamName = h1Match[1].trim();
+      teamName = fullTeamName.split('(')[0].trim();
+    }
+    
+    // 方法2: ページ内の見出し構造から（# で始まる行）
+    if (!teamName) {
+      const headingMatch = html.match(/^#\s+(.+)$/m);
+      if (headingMatch) {
+        fullTeamName = headingMatch[1].trim();
+        teamName = fullTeamName.split('(')[0].trim();
+      }
+    }
+    
+    // 方法3: Vereinセクションのリンクから
+    if (!teamName) {
+      const vereinMatch = html.match(/<strong>Verein<\/strong>[\s\S]*?>\s*([^<(]+)/);
+      if (vereinMatch) {
+        teamName = vereinMatch[1].trim();
+      }
+    }
+    
+    // 方法4: Mannschaftセクションから
+    if (!teamName) {
+      const mannschaftMatch = html.match(/<strong>Mannschaft<\/strong>[\s\S]*?>\s*([^<]+)</);
+      if (mannschaftMatch) {
+        teamName = mannschaftMatch[1].trim();
+      }
+    }
+    
+    if (!teamName) {
       // デバッグ: タイトルタグも試す
       const titleMatch = html.match(/<title>([^<]+)<\/title>/);
       const debugInfo = titleMatch ? `Gefundener Titel: ${titleMatch[1]}` : 'Kein Titel gefunden';
       
+      // HTMLの最初の部分も表示（デバッグ用）
+      const htmlPreview = html.substring(0, 500).replace(/\n/g, ' ');
+      
       return NextResponse.json(
-        { error: `Teamname konnte nicht gefunden werden. ${debugInfo}. Bitte überprüfe, ob die URL zur Mannschaftsseite führt.` },
+        { error: `Teamname konnte nicht gefunden werden. ${debugInfo}. HTML-Vorschau: ${htmlPreview}` },
         { status: 400 }
       );
     }
     
-    const fullTeamName = teamNameMatch[1].trim();
-    // "Uslarer TC (103111) Herren 60 , Sommer 2026" から "Uslarer TC" を抽出
-    const teamName = fullTeamName.split('(')[0].trim();
+    // fullTeamNameが設定されていない場合はteamNameを使用
+    if (!fullTeamName) {
+      fullTeamName = teamName;
+    }
     
     // チーム名の部分一致を柔軟に判定する関数
     const isMyTeam = (teamInTable: string): boolean => {
