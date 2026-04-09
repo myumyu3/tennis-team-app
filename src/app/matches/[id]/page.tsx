@@ -113,22 +113,22 @@ export default function MatchDetailPage() {
           }
         }
 
+        // 全員の回答取得（全メンバーが閲覧可能）
+        const allTeilnahmenQuery = query(
+          collection(db, 'teilnahmen'),
+          where('teamId', '==', team.id),
+          where('spielId', '==', matchId)
+        );
+        const allTeilnahmenSnapshot = await getDocs(allTeilnahmenQuery);
+        const teilnahmenData = allTeilnahmenSnapshot.docs.map(doc => {
+          const teilnahme = { id: doc.id, ...doc.data() } as Teilnahme;
+          const teilnahmeMember = membersData.find(m => m.id === teilnahme.mitgliedId);
+          return { ...teilnahme, member: teilnahmeMember };
+        });
+        setAllTeilnahmen(teilnahmenData);
+
         // 管理者の場合は追加データ取得
         if (member.istAdmin) {
-          // 全員の回答取得
-          const allTeilnahmenQuery = query(
-            collection(db, 'teilnahmen'),
-            where('teamId', '==', team.id),
-            where('spielId', '==', matchId)
-          );
-          const allTeilnahmenSnapshot = await getDocs(allTeilnahmenQuery);
-          const teilnahmenData = allTeilnahmenSnapshot.docs.map(doc => {
-            const teilnahme = { id: doc.id, ...doc.data() } as Teilnahme;
-            const teilnahmeMember = membersData.find(m => m.id === teilnahme.mitgliedId);
-            return { ...teilnahme, member: teilnahmeMember };
-          });
-          setAllTeilnahmen(teilnahmenData);
-
           // Heimspiel の場合は持ち物割り当て取得
           if (matchData.istHeimspiel) {
             const heimQuery = query(
