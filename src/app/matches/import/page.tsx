@@ -196,13 +196,42 @@ export default function ImportNuLigaPage() {
 
         {/* 試合リスト */}
         {matches.length > 0 && (
-          <div className="card">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
-              2. Spiele auswählen ({matches.filter(m => m.selected).length}/{matches.length})
-            </h2>
-            <p className="text-sm text-gray-600 mb-4">
-              Team: <strong>{teamName}</strong>
-            </p>
+          <>
+            {/* チーム確認 */}
+            <div className="card bg-primary-50 border-2 border-primary-300">
+              <h2 className="text-xl font-bold text-gray-900 mb-3">
+                ✓ Erkanntes Team
+              </h2>
+              <div className="space-y-2">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl">🎾</span>
+                  <div>
+                    <div className="font-bold text-lg text-gray-900">{teamName}</div>
+                    <div className="text-sm text-gray-600">Teamname</div>
+                  </div>
+                </div>
+                {clubAddress && (
+                  <div className="flex items-start gap-3">
+                    <span className="text-2xl">📍</span>
+                    <div>
+                      <div className="font-medium text-gray-900">{clubAddress}</div>
+                      <div className="text-sm text-gray-600">Vereinsadresse</div>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="mt-3 pt-3 border-t border-primary-200">
+                <p className="text-sm text-gray-700">
+                  ⚠️ <strong>Bitte überprüfen:</strong> Ist das dein Team? Falls nicht, korrigiere die URL.
+                </p>
+              </div>
+            </div>
+
+            {/* 試合選択 */}
+            <div className="card">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                2. Spiele auswählen ({matches.filter(m => m.selected).length}/{matches.length})
+              </h2>
 
             <div className="space-y-4">
               {matches.map((match, index) => (
@@ -269,6 +298,7 @@ export default function ImportNuLigaPage() {
               </button>
             </div>
           </div>
+          </>
         )}
 
       </main>

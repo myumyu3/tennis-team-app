@@ -44,6 +44,28 @@ export async function POST(request: NextRequest) {
     const fullTeamName = teamNameMatch[1].trim();
     // "Uslarer TC (103111) Herren 60 , Sommer 2026" から "Uslarer TC" を抽出
     const teamName = fullTeamName.split('(')[0].trim();
+    
+    // チーム名の部分一致を柔軟に判定する関数
+    const isMyTeam = (teamInTable: string): boolean => {
+      const normalizedTable = teamInTable.toLowerCase().trim();
+      const normalizedMyTeam = teamName.toLowerCase().trim();
+      
+      // 完全一致
+      if (normalizedTable === normalizedMyTeam) return true;
+      
+      // 自チーム名が試合テーブルのチーム名に含まれる（例: "TC Bad Vilbel" が "TC Bad Vilbel 1" に含まれる）
+      if (normalizedTable.includes(normalizedMyTeam)) return true;
+      
+      // 試合テーブルのチーム名が自チーム名で始まる（例: "TC Bad Vilbel 1" が "TC Bad Vilbel" で始まる）
+      if (normalizedTable.startsWith(normalizedMyTeam)) return true;
+      
+      // 最初の2単語が一致（例: "TC Bad Vilbel" と "TC Bad Vilbel 1"）
+      const myTeamWords = normalizedMyTeam.split(' ').slice(0, 2).join(' ');
+      const tableWords = normalizedTable.split(' ').slice(0, 2).join(' ');
+      if (myTeamWords && tableWords && myTeamWords === tableWords) return true;
+      
+      return false;
+    };
 
     // クラブ住所を抽出（ホームゲーム用）
     let clubAddress = '';
@@ -99,8 +121,7 @@ export async function POST(request: NextRequest) {
         const homeTeam = teamCells[0].replace(/<[^>]+>/g, '').trim();
         const awayTeam = teamCells[1].replace(/<[^>]+>/g, '').trim();
         
-        const isHomeGame = homeTeam.includes(teamName.split(' ')[0]) || 
-                          homeTeam.includes(teamName);
+        const isHomeGame = isMyTeam(homeTeam);
         
         matches.push({ date, time, homeTeam, awayTeam, isHomeGame });
         continue;
@@ -118,8 +139,7 @@ export async function POST(request: NextRequest) {
       if (!homeTeam || !awayTeam) continue;
 
       // 自チームがホームかどうか判定
-      const isHomeGame = homeTeam.includes(teamName.split(' ')[0]) || 
-                        homeTeam.includes(teamName);
+      const isHomeGame = isMyTeam(homeTeam);
 
       matches.push({ date, time, homeTeam, awayTeam, isHomeGame });
     }
