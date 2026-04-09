@@ -166,10 +166,37 @@ export default function ImportNuLigaPage() {
         
         {/* URL入力 */}
         <div className="card">
+          {/* 警告メッセージ */}
+          <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <span className="text-3xl">⚠️</span>
+              <div>
+                <h3 className="font-bold text-yellow-900 mb-1">🚧 Diese Funktion befindet sich noch im Test</h3>
+                <p className="text-sm text-yellow-800">
+                  Der automatische Import von nuLiga funktioniert möglicherweise nicht für alle Teams. 
+                  Bei Problemen bitte Spiele manuell erstellen.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <h2 className="text-xl font-bold text-gray-900 mb-4">1. nuLiga URL eingeben</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Gehe zu deinem Team auf nuLiga und kopiere die URL aus der Adressleiste.
+            Gehe zu deinem Team auf nuLiga und kopiere die <strong>vollständige URL</strong> aus der Adressleiste.
           </p>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <p className="text-sm text-blue-900 font-semibold mb-2">💡 So gehts:</p>
+            <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+              <li>Öffne nuLiga im Browser</li>
+              <li>Gehe zu deiner Mannschaft</li>
+              <li>Kopiere die <strong>komplette URL</strong> (beginnt mit https://)</li>
+              <li>Füge sie hier ein</li>
+            </ol>
+            <p className="text-xs text-blue-700 mt-2">
+              Beispiel: https://wtv.liga.nu/cgi-bin/WebObjects/nuLigaTENDE.woa/wa/teamPortrait?team=...
+            </p>
+          </div>
           
           <input
             type="text"
