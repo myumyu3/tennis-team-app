@@ -260,6 +260,9 @@ export function getSession(): SessionData | null {
 export function logout(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('tennisSession');
+    // 自動ログイン情報も削除
+    localStorage.removeItem('tennisRememberNachname');
+    localStorage.removeItem('tennisRememberGeburtsdatum');
   }
 }
 

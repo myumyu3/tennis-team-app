@@ -18,25 +18,25 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<'credentials' | 'team-select'>('credentials');
   const [rememberMe, setRememberMe] = useState(false);
+  const [showAutoLoginPrompt, setShowAutoLoginPrompt] = useState(false);
+  const [savedCredentials, setSavedCredentials] = useState<{ nachname: string; geburtsdatum: string } | null>(null);
 
-  // ページロード時：保存されたログイン情報があれば自動ログイン
+  // ページロード時：保存されたログイン情報があれば確認画面を表示
   useEffect(() => {
     const savedNachname = localStorage.getItem('tennisRememberNachname');
     const savedGeburtsdatum = localStorage.getItem('tennisRememberGeburtsdatum');
     
     if (savedNachname && savedGeburtsdatum) {
-      // 保存された情報がある場合、自動的にログイン処理を実行
-      setNachname(savedNachname);
-      setGeburtsdatum(savedGeburtsdatum);
-      setRememberMe(true);
-      
-      // 自動ログインを実行
-      autoLogin(savedNachname, savedGeburtsdatum);
+      // 保存された情報を設定して確認画面を表示
+      setSavedCredentials({ nachname: savedNachname, geburtsdatum: savedGeburtsdatum });
+      setShowAutoLoginPrompt(true);
     }
   }, []);
 
   // 自動ログイン処理
   const autoLogin = async (savedNachname: string, savedGeburtsdatum: string) => {
+    setIsSubmitting(true);
+    setError('');
     try {
       const germanDate = convertIsoToGerman(savedGeburtsdatum);
       const result = await authLogin(savedNachname, germanDate);
@@ -47,11 +47,41 @@ export default function LoginPage() {
       } else if (result?.teams && result.teams.length > 0) {
         setAvailableTeams(result.teams);
         setStep('team-select');
+        setShowAutoLoginPrompt(false);
+      } else {
+        // ログイン失敗：手動ログイン画面に戻る
+        setError('Automatische Anmeldung fehlgeschlagen.');
+        setShowAutoLoginPrompt(false);
+        setNachname('');
+        setGeburtsdatum('');
       }
     } catch (err) {
       console.error('Auto login error:', err);
-      // 自動ログイン失敗時は何もしない（手動ログインできる状態にする）
+      setError('Automatische Anmeldung fehlgeschlagen. Bitte manuell anmelden.');
+      setShowAutoLoginPrompt(false);
+      setNachname('');
+      setGeburtsdatum('');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  // 保存された情報で自動ログイン
+  const handleAutoLogin = () => {
+    if (savedCredentials) {
+      autoLogin(savedCredentials.nachname, savedCredentials.geburtsdatum);
+    }
+  };
+
+  // 別のアカウントでログイン
+  const handleDifferentAccount = () => {
+    setShowAutoLoginPrompt(false);
+    setNachname('');
+    setGeburtsdatum('');
+    setRememberMe(false);
+    // 自動ログイン情報を削除
+    localStorage.removeItem('tennisRememberNachname');
+    localStorage.removeItem('tennisRememberGeburtsdatum');
   };
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
@@ -165,7 +195,43 @@ export default function LoginPage() {
         </div>
 
         <div className="card">
-          {step === 'credentials' ? (
+          {showAutoLoginPrompt ? (
+            // 自動ログイン確認画面
+            <div className="space-y-4">
+              <div className="text-center">
+                <p className="text-lg font-semibold text-gray-900 mb-2">
+                  Willkommen zurück!
+                </p>
+                <p className="text-sm text-gray-600 mb-4">
+                  Möchtest du dich als <strong>{savedCredentials?.nachname}</strong> anmelden?
+                </p>
+              </div>
+
+              <button
+                onClick={handleAutoLogin}
+                disabled={isSubmitting || !savedCredentials}
+                className="btn-primary w-full"
+              >
+                {isSubmitting 
+                  ? 'Anmelden...' 
+                  : `✓ Als ${savedCredentials?.nachname || ''} anmelden`
+                }
+              </button>
+
+              <button
+                onClick={handleDifferentAccount}
+                className="btn-secondary w-full"
+              >
+                🔄 Mit anderem Konto anmelden
+              </button>
+
+              {error && (
+                <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  {error}
+                </div>
+              )}
+            </div>
+          ) : step === 'credentials' ? (
             <form onSubmit={handleCredentialsSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Nachname</label>
