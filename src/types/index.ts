@@ -10,6 +10,7 @@ export interface Team {
 export interface Member {
   id: string;
   teamId: string;            // 所属チームID
+  uid?: string;              // Firebase Auth UID（移行期間はオプショナル）
   nachname: string;          // 苗字
   vorname: string;           // 名前
   geburtsdatum: string;      // TT.MM.JJJJ 形式

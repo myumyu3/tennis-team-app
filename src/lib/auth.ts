@@ -1,7 +1,8 @@
 // 認証関連のユーティリティ関数（マルチチーム対応版 - 改善版）
 
-import { collection, query, where, getDocs, addDoc, doc, getDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import { collection, query, where, getDocs, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { signInAnonymously } from 'firebase/auth';
+import { auth, db } from './firebase';
 import { Member, Team, SessionData } from '@/types';
 
 /**
@@ -17,6 +18,22 @@ export function generateEinladungscode(): string {
 }
 
 /**
+ * 匿名認証で uid を取得（既存セッションがあれば再利用）
+ */
+async function getAnonymousUid(): Promise<string | null> {
+  try {
+    if (auth.currentUser?.uid) {
+      return auth.currentUser.uid;
+    }
+    const userCredential = await signInAnonymously(auth);
+    return userCredential.user.uid;
+  } catch (error) {
+    console.error('Anonymous auth error:', error);
+    return null;
+  }
+}
+
+/**
  * チームを作成
  */
 export async function createTeam(
@@ -26,6 +43,9 @@ export async function createTeam(
   adminGeburtsdatum: string
 ): Promise<{ team: Team; member: Member } | null> {
   try {
+    const uid = await getAnonymousUid();
+    if (!uid) return null;
+
     // 招待コード生成（重複チェック付き）
     let einladungscode = generateEinladungscode();
     let isDuplicate = true;
@@ -58,6 +78,7 @@ export async function createTeam(
     // 管理者メンバーを作成
     const memberRef = await addDoc(collection(db, 'members'), {
       teamId: teamRef.id,
+      uid,
       nachname: adminNachname,
       vorname: adminVorname,
       geburtsdatum: adminGeburtsdatum,
@@ -68,6 +89,7 @@ export async function createTeam(
     const member: Member = {
       id: memberRef.id,
       teamId: teamRef.id,
+      uid,
       nachname: adminNachname,
       vorname: adminVorname,
       geburtsdatum: adminGeburtsdatum,
@@ -92,6 +114,9 @@ export async function joinTeam(
   geburtsdatum: string
 ): Promise<{ team: Team; member: Member } | null> {
   try {
+    const uid = await getAnonymousUid();
+    if (!uid) return null;
+
     // 招待コードでチーム検索
     const teamsRef = collection(db, 'teams');
     const teamQuery = query(teamsRef, where('einladungscode', '==', einladungscode.toUpperCase()));
@@ -120,16 +145,25 @@ export async function joinTeam(
     if (!existingMember.empty) {
       // 既存メンバーとしてログイン
       const memberDoc = existingMember.docs[0];
+      const memberData = memberDoc.data() as Omit<Member, 'id'>;
+
+      // 既存メンバーに uid がなければ移行のため保存
+      if (!memberData.uid) {
+        await updateDoc(doc(db, 'members', memberDoc.id), { uid });
+      }
+
       const member: Member = {
         id: memberDoc.id,
-        ...memberDoc.data()
-      } as Member;
+        ...memberData,
+        uid: memberData.uid ?? uid
+      };
       return { team, member };
     }
     
     // 新規メンバーとして追加
     const memberRef = await addDoc(collection(db, 'members'), {
       teamId: team.id,
+      uid,
       nachname,
       vorname,
       geburtsdatum,
@@ -140,6 +174,7 @@ export async function joinTeam(
     const member: Member = {
       id: memberRef.id,
       teamId: team.id,
+      uid,
       nachname,
       vorname,
       geburtsdatum,
@@ -163,6 +198,9 @@ export async function login(
   teamId?: string
 ): Promise<{ teams: Team[]; member?: Member; team?: Team } | null> {
   try {
+    const uid = await getAnonymousUid();
+    if (!uid) return null;
+
     // 該当するメンバーを検索
     const membersRef = collection(db, 'members');
     const q = query(
@@ -178,10 +216,21 @@ export async function login(
       return null;
     }
     
-    const members = memberSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    } as Member));
+    const members: Member[] = [];
+    for (const memberDoc of memberSnapshot.docs) {
+      const memberData = memberDoc.data() as Omit<Member, 'id'>;
+
+      // 既存メンバーに uid がなければ移行のため保存
+      if (!memberData.uid) {
+        await updateDoc(doc(db, 'members', memberDoc.id), { uid });
+      }
+
+      members.push({
+        id: memberDoc.id,
+        ...memberData,
+        uid: memberData.uid ?? uid
+      });
+    }
     
     // 各メンバーのチーム情報を取得
     const teams: Team[] = [];

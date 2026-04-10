@@ -18,10 +18,8 @@ service cloud.firestore {
       allow create: if request.resource.data.teamId is string
                     && request.resource.data.nachname is string
                     && request.resource.data.geburtsdatum is string;
-      // 既存運用を止めないため、更新は許可
-      allow update: if true;
-      // 日常運用では削除を使っていないため、誤削除を防止
-      allow delete: if false;
+      // 既存運用を止めないため、更新/削除は当面許可
+      allow update, delete: if true;
     }
     
     // 試合 - teamIdベースの保護
