@@ -20,8 +20,8 @@ service cloud.firestore {
                     && request.resource.data.geburtsdatum is string;
       // 既存運用を止めないため、更新は許可
       allow update: if true;
-      // 日常運用では削除を使っていないため、誤削除を防止
-      allow delete: if false;
+      // チーム削除フローで members を削除するため許可
+      allow delete: if true;
     }
     
     // 試合 - teamIdベースの保護

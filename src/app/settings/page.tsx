@@ -83,8 +83,8 @@ export default function SettingsPage() {
       console.log('🗑️ Starte Team-Löschung...');
 
       // 1. Gastspiel Autos löschen
-      setDeleteProgress('Lösche Fahrgemeinschaften... (1/6)');
-      console.log('🗑️ [1/6] Lösche Fahrgemeinschaften...');
+      setDeleteProgress('Lösche Fahrgemeinschaften... (1/5)');
+      console.log('🗑️ [1/5] Lösche Fahrgemeinschaften...');
       const autosQuery = query(collection(db, 'gast_spiel_autos'), where('teamId', '==', team.id));
       const autosSnapshot = await getDocs(autosQuery);
       console.log(`   Gefunden: ${autosSnapshot.size} Dokumente`);
@@ -94,8 +94,8 @@ export default function SettingsPage() {
       console.log('   ✅ Fahrgemeinschaften gelöscht');
 
       // 2. Heimspiel Aufgaben löschen
-      setDeleteProgress('Lösche Heimspiel-Aufgaben... (2/6)');
-      console.log('🗑️ [2/6] Lösche Heimspiel-Aufgaben...');
+      setDeleteProgress('Lösche Heimspiel-Aufgaben... (2/5)');
+      console.log('🗑️ [2/5] Lösche Heimspiel-Aufgaben...');
       const aufgabenQuery = query(collection(db, 'heim_spiel_aufgaben'), where('teamId', '==', team.id));
       const aufgabenSnapshot = await getDocs(aufgabenQuery);
       console.log(`   Gefunden: ${aufgabenSnapshot.size} Dokumente`);
@@ -105,8 +105,8 @@ export default function SettingsPage() {
       console.log('   ✅ Heimspiel-Aufgaben gelöscht');
 
       // 3. Teilnahmen löschen
-      setDeleteProgress('Lösche Zusagen... (3/6)');
-      console.log('🗑️ [3/6] Lösche Zusagen...');
+      setDeleteProgress('Lösche Zusagen... (3/5)');
+      console.log('🗑️ [3/5] Lösche Zusagen...');
       const teilnahmenQuery = query(collection(db, 'teilnahmen'), where('teamId', '==', team.id));
       const teilnahmenSnapshot = await getDocs(teilnahmenQuery);
       console.log(`   Gefunden: ${teilnahmenSnapshot.size} Dokumente`);
@@ -116,8 +116,8 @@ export default function SettingsPage() {
       console.log('   ✅ Zusagen gelöscht');
 
       // 4. Matches löschen
-      setDeleteProgress('Lösche Spiele... (4/6)');
-      console.log('🗑️ [4/6] Lösche Spiele...');
+      setDeleteProgress('Lösche Spiele... (4/5)');
+      console.log('🗑️ [4/5] Lösche Spiele...');
       const matchesQuery = query(collection(db, 'matches'), where('teamId', '==', team.id));
       const matchesSnapshot = await getDocs(matchesQuery);
       console.log(`   Gefunden: ${matchesSnapshot.size} Dokumente`);
@@ -126,20 +126,9 @@ export default function SettingsPage() {
       }
       console.log('   ✅ Spiele gelöscht');
 
-      // 5. Members löschen
-      setDeleteProgress('Lösche Mitglieder... (5/6)');
-      console.log('🗑️ [5/6] Lösche Mitglieder...');
-      const membersQuery = query(collection(db, 'members'), where('teamId', '==', team.id));
-      const membersSnapshot = await getDocs(membersQuery);
-      console.log(`   Gefunden: ${membersSnapshot.size} Dokumente`);
-      for (const docSnapshot of membersSnapshot.docs) {
-        await deleteDoc(docSnapshot.ref);
-      }
-      console.log('   ✅ Mitglieder gelöscht');
-
-      // 6. Team löschen
-      setDeleteProgress('Lösche Team... (6/6)');
-      console.log('🗑️ [6/6] Lösche Team...');
+      // 5. Team löschen
+      setDeleteProgress('Lösche Team... (5/5)');
+      console.log('🗑️ [5/5] Lösche Team...');
       await deleteDoc(doc(db, 'teams', team.id));
       console.log('   ✅ Team gelöscht');
 
@@ -152,7 +141,8 @@ export default function SettingsPage() {
 
       alert(
         `✅ Erfolgreich gelöscht!\n\n` +
-        `Team "${team.name}" und alle zugehörigen Daten wurden vollständig entfernt.`
+        `Team "${team.name}" und die zugehörigen Teamdaten wurden entfernt.\n` +
+        `Mitgliederkonten wurden nicht gelöscht.`
       );
 
       // 8. トップページへリダイレクト
@@ -249,7 +239,6 @@ export default function SettingsPage() {
                   Diese Aktion löscht <strong>unwiderruflich</strong>:
                 </p>
                 <ul className="text-sm text-red-800 space-y-1 mb-4 list-disc list-inside">
-                  <li>Alle {memberCount} Mitglieder</li>
                   <li>Alle Spiele und Zusagen</li>
                   <li>Alle Heimspiel-Aufgaben</li>
                   <li>Alle Fahrgemeinschaften</li>
@@ -315,7 +304,8 @@ export default function SettingsPage() {
           <ul className="text-sm text-blue-800 space-y-1">
             <li>• Der Einladungscode kann mit anderen geteilt werden</li>
             <li>• Nur Teamleiter können Einstellungen ändern</li>
-            <li>• Team-Löschung ist unwiderruflich - alle Daten gehen verloren</li>
+            <li>• Team-Löschung ist unwiderruflich - Teamdaten gehen verloren</li>
+            <li>• Mitgliederkonten bleiben erhalten</li>
             <li>• Bei versehentlicher Löschung gibt es keine Wiederherstellung</li>
           </ul>
         </div>

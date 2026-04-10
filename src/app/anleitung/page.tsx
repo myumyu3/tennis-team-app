@@ -152,12 +152,14 @@ export default function AnleitungPage() {
               <p className="font-bold text-red-900 mb-2">WICHTIG: Diese Aktion ist UNWIDERRUFLICH!</p>
               <p className="text-gray-700 mb-2">Das Löschen entfernt dauerhaft:</p>
               <ul className="list-disc list-inside text-gray-700 space-y-1">
-                <li>Alle Mitglieder</li>
                 <li>Alle Spiele und Zusagen</li>
                 <li>Alle Heimspiel-Aufgaben</li>
                 <li>Alle Fahrgemeinschaften</li>
                 <li>Das gesamte Team</li>
               </ul>
+              <p className="text-gray-700 mt-3">
+                Mitgliederkonten bleiben erhalten und werden nicht gelöscht.
+              </p>
             </div>
 
             <p className="text-gray-700 mb-2"><strong>So löschst du ein Team:</strong></p>
@@ -167,7 +169,7 @@ export default function AnleitungPage() {
               <li>Klicke auf <strong>"Team löschen"</strong></li>
               <li>Gib den exakten Teamnamen ein</li>
               <li>Klicke auf <strong>"Endgültig löschen"</strong></li>
-              <li>Der Löschvorgang zeigt den Fortschritt (1/6 bis 6/6)</li>
+              <li>Der Löschvorgang zeigt den Fortschritt (1/5 bis 5/5)</li>
               <li>Nach erfolgreicher Löschung wirst du zur Startseite weitergeleitet</li>
             </ol>
 
