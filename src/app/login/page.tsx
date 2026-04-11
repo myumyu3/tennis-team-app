@@ -255,6 +255,10 @@ export default function LoginPage() {
                   required
                   max={new Date().toISOString().split('T')[0]}
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Dasselbe Datum wie bei der Registrierung eingeben. Das kann auch ein frei gewählter Tag sein, kein
+                  echtes Geburtsdatum.
+                </p>
               </div>
 
               <div className="flex items-center">

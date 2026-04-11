@@ -221,7 +221,10 @@ export default function MembersPage() {
                   required
                   max={new Date().toISOString().split('T')[0]}
                 />
-                <p className="text-xs text-gray-500 mt-1">Wird als Login-Passwort verwendet</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Wird als Login-Passwort verwendet. Es muss nicht das echte Geburtsdatum sein – ein beliebiger
+                  einprägsamer Tag reicht; beim Anmelden muss derselbe Tag eingegeben werden.
+                </p>
               </div>
 
               <div className="flex items-center gap-3">

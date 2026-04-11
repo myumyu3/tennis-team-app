@@ -135,7 +135,8 @@ export default function CreateTeamPage() {
                     max={new Date().toISOString().split('T')[0]}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Wird als dein Login-Passwort verwendet
+                    Wird als dein Login-Passwort verwendet. Es muss nicht dein echtes Geburtsdatum sein: Du kannst
+                    einen beliebigen einprägsamen Tag wählen und musst denselben später bei der Anmeldung eingeben.
                   </p>
                 </div>
               </div>

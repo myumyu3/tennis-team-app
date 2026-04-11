@@ -69,7 +69,7 @@ export default function AnleitungPage() {
             <ol className="list-decimal list-inside text-gray-700 space-y-1 mb-4">
               <li>Gehe zur App-Startseite</li>
               <li>Klicke auf <strong>"Neues Team erstellen"</strong></li>
-              <li>Gib Teamname, Vorname, Nachname und Geburtsdatum ein</li>
+              <li>Gib Teamname, Vorname, Nachname und ein Datum ein (siehe Hinweis unten)</li>
               <li>Klicke auf <strong>"Team erstellen"</strong></li>
               <li><strong>Wichtig:</strong> Du erhältst einen <strong>6-stelligen Einladungscode</strong></li>
             </ol>
@@ -78,7 +78,7 @@ export default function AnleitungPage() {
             <ol className="list-decimal list-inside text-gray-700 space-y-1 mb-4">
               <li>Gehe zur App-Startseite</li>
               <li>Klicke auf <strong>"Team beitreten"</strong></li>
-              <li>Gib den Einladungscode und deine Daten ein</li>
+              <li>Gib den Einladungscode sowie Vorname, Nachname und Datum ein (siehe Hinweis unten)</li>
               <li>Klicke auf <strong>"Team beitreten"</strong></li>
             </ol>
 
@@ -86,10 +86,19 @@ export default function AnleitungPage() {
             <ol className="list-decimal list-inside text-gray-700 space-y-1">
               <li>Gehe zur App-Startseite</li>
               <li>Klicke auf <strong>"Anmelden"</strong></li>
-              <li>Gib Nachname und Geburtsdatum ein</li>
+              <li>Gib Nachname und dasselbe Datum wie bei der Registrierung ein (siehe Hinweis unten)</li>
               <li>Wähle dein Team (falls mehrere)</li>
               <li>Klicke auf <strong>"Weiter"</strong></li>
             </ol>
+
+            <div className="bg-gray-50 border border-gray-300 rounded-lg p-4 mt-4">
+              <p className="text-sm font-semibold text-gray-900 mb-2">Hinweis zum Feld „Geburtsdatum“</p>
+              <p className="text-sm text-gray-700">
+                Dieses Datum wird wie ein Passwort verwendet. Es muss nicht dein echtes Geburtsdatum sein – ein
+                beliebiger einprägsamer Tag reicht. Beim Anmelden gibst du denselben Tag erneut ein. Die App fragt
+                keine Adresse, keine E-Mail-Adresse und keine Telefonnummer ab.
+              </p>
+            </div>
           </section>
 
           {/* Fahrgemeinschaften */}
@@ -189,7 +198,10 @@ export default function AnleitungPage() {
             <ul className="list-disc list-inside text-gray-700 space-y-2">
               <li><strong>Zeitangabe ist optional</strong> - Leer lassen, wenn noch nicht festgelegt</li>
               <li><strong>Mehrere Teams</strong> - Du kannst mehreren Teams angehören</li>
-              <li><strong>Passwort = Geburtsdatum</strong> - Teile es nicht mit Unbefugten</li>
+              <li>
+                <strong>Anmeldung</strong> - Nachname plus das bei der Registrierung gewählte Datum (geheimes Kennwort).
+                Muss kein echtes Geburtsdatum sein; mit Unbefugten nicht teilen.
+              </li>
               <li><strong>Browser-Daten nicht löschen</strong> - Sonst musst du dich neu anmelden</li>
             </ul>
           </section>
@@ -225,6 +237,8 @@ export default function AnleitungPage() {
           <section className="bg-blue-50 border border-blue-200 rounded-lg p-6">
             <h2 className="text-2xl font-bold text-blue-900 mb-3">🔒 Datenschutz und Sicherheit</h2>
             <ul className="list-disc list-inside text-gray-700 space-y-1">
+              <li>Es werden keine Adresse, keine E-Mail-Adresse und keine Telefonnummer erhoben</li>
+              <li>Zur Anmeldung: Vor- und Nachname sowie ein von dir gewähltes Datum (als Kennwort)</li>
               <li>Alle Daten sind in der Cloud gespeichert (Google Firebase)</li>
               <li>Nur Teammitglieder haben Zugriff auf Teamdaten</li>
               <li>Jedes Team ist komplett getrennt</li>
